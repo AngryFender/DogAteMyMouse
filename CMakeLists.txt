@@ -24,20 +24,18 @@ set(IMGUI_SOURCES
   ${IMGUI_DIR}/backend/imgui_impl_win32.cpp
 )
 
-add_library(imgui STATIC ${IMGUI_SOURCES})
+# Add source to this project's executable.
+add_executable (${PROJECT_NAME} 
+    "src/main.cpp"
+    ${IMGUI_SOURCES}
+)
 
-target_include_directories(imgui PUBLIC
+target_include_directories(${PROJECT_NAME} PUBLIC
   ${IMGUI_DIR}
   ${IMGUI_DIR}/backend
 )
 
-# Add source to this project's executable.
-add_executable (${PROJECT_NAME} 
-    "src/main.cpp"
-)
-
 target_link_libraries(${PROJECT_NAME}
-  imgui
   d3d11
   dxgi
 )
