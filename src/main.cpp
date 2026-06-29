@@ -46,8 +46,29 @@ int main()
     //show the window
     ::ShowWindow(hWnd, SW_SHOWDEFAULT);
     ::UpdateWindow(hWnd);
+
+    //setup Dear ImGui contexnt
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    
+    //setup Dear ImGui style
+    ImGui::StyleColorsLight();
+
+    //setup scaling
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.ScaleAllSizes(main_scale);
+    style.FontScaleDpi = main_scale;
+
+    //setup platform/renderer backends
+    ImGui_ImplWin32_Init(hWnd);
+    ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
     
     bool shutdown = false;
+
+    //state
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     while (!shutdown) 
     {
@@ -64,15 +85,44 @@ int main()
         if (shutdown)
             break;
 
+        //start new frame
+        ImGui_ImplDX11_NewFrame();
+        ImGui_ImplWin32_NewFrame();
+        ImGui::NewFrame();
+
+        {
+            ImGui::Begin("Main Window");
+            ImGui::Text("Writing a text here");
+            ImGui::Text("Writing another text here");
+
+            ImGui::End();
+        }
+        
+        //rendering
+        ImGui::Render();
+        const float clear_color_with_alpha[4] = { clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w };
+
+        //point the directX commander at the canvas
+        g_pd3dDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, nullptr);
+        
+        //wipe the canvas clean with the clean color
+        g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, clear_color_with_alpha);
+
+        //pain the ImGui vertex data onto the canvas
+        ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+        
         //Enable VSync
         HRESULT hr = g_pSwapChain->Present(1, 0);
 
     }
 
     //cleanup 
+    ImGui_ImplDX11_Shutdown();
+    ImGui_ImplWin32_Shutdown();
+    ImGui::DestroyContext();
+
     CleanupDeviceD3D();
     ::UnregisterClassW(wc.lpszClassName, wc.hInstance);
-
 
     return 0;
 }
