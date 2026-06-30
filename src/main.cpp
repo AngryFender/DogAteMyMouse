@@ -4,7 +4,10 @@
 #include <d3d11.h>
 #include <tchar.h>
 #include <Windows.h>
+#include <dwmapi.h>
 
+//hide the console window
+#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup" )
 
 //allocate memory and create resources in the gpu
 inline ID3D11Device* g_pd3dDevice = nullptr;
@@ -32,10 +35,17 @@ int main()
         ::MonitorFromPoint(POINT{ 0,0 }, MONITOR_DEFAULTTOPRIMARY)
     );
 
+    auto win_x = ::GetSystemMetrics(SM_CXSCREEN);
+    auto win_y = ::GetSystemMetrics(SM_CYSCREEN);
+
     //using win32 api to create a handle for a new window
     WNDCLASSEXW wc = { sizeof(wc), CS_CLASSDC, WinProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"Dog Ate My Mouse", nullptr };
     ::RegisterClassExW(&wc);
-    HWND hWnd = ::CreateWindowW(wc.lpszClassName, L"Dog ate my mouse", WS_OVERLAPPEDWINDOW, 0, 0, (int)(1280 * main_scale), (int)(800 * main_scale), nullptr, nullptr, wc.hInstance, nullptr);
+    HWND hWnd = ::CreateWindowExW(WS_EX_TOPMOST | WS_EX_LAYERED, wc.lpszClassName, L"Dog ate my mouse", WS_POPUP, 0, 0, win_x, win_y, nullptr, nullptr, wc.hInstance, nullptr);
+
+    MARGINS margins = { -1, -1, -1,-1 };
+    ::DwmExtendFrameIntoClientArea(hWnd, &margins);
+    ::SetLayeredWindowAttributes(hWnd, 0, 255, LWA_ALPHA);
 
     if (!CreateDeviceD3D(hWnd)) {
         CleanupDeviceD3D();
@@ -68,7 +78,7 @@ int main()
     bool shutdown = false;
 
     //state
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 0.00f);
 
     while (!shutdown) 
     {
@@ -132,7 +142,7 @@ bool CreateDeviceD3D(HWND hWnd)
     // Setup swap chain
     DXGI_SWAP_CHAIN_DESC sd;
     ZeroMemory(&sd, sizeof(sd));
-    sd.BufferCount = 2;
+    sd.BufferCount = 1;
     sd.BufferDesc.Width = 0;
     sd.BufferDesc.Height = 0;
     sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -144,7 +154,7 @@ bool CreateDeviceD3D(HWND hWnd)
     sd.SampleDesc.Count = 1;
     sd.SampleDesc.Quality = 0;
     sd.Windowed = TRUE;
-    sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+    sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 
     UINT createDeviceFlags = 0;
     //createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
