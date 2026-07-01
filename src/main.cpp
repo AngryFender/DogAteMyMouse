@@ -100,13 +100,14 @@ int main()
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
 
-        {
-            ImGui::Begin("Main Window");
-            ImGui::Text("Writing a text here");
-            ImGui::Text("Writing another text here");
+        //Bypass the ImGUI windows system and get the background canvas
+        ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
 
-            ImGui::End();
-        }
+        draw_list->AddText(
+            ImVec2(1200.0f, 1200.0f),
+            IM_COL32(255,0,0,255),
+            "Tests"
+        );
         
         //rendering
         ImGui::Render();
