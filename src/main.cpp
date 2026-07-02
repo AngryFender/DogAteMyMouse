@@ -203,12 +203,21 @@ LRESULT WINAPI WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         return true;
     }
 
-    switch (msg) 
+    switch (msg)
     {
     case WM_SIZE:
         if (wParam == SIZE_MINIMIZED) {
         }
         break;
+    case WM_KEYDOWN: 
+    {
+        if (wParam == VK_ESCAPE)
+        {
+            ::PostQuitMessage(0);
+            return 0;
+        }
+        break;
+    }
     case WM_DESTROY:
         ::PostQuitMessage(0);
         return 0;
