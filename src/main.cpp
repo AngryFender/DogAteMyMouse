@@ -53,8 +53,8 @@ int main()
         return 1;
     }
 
-    //show the window
-    ::ShowWindow(hWnd, SW_SHOWDEFAULT);
+    //hide the window
+    ::ShowWindow(hWnd, SW_HIDE);
     ::UpdateWindow(hWnd);
 
     //setup Dear ImGui contexnt
