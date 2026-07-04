@@ -27,6 +27,12 @@ void CreateRenderTarget();
 void CleanupRenderTarget();
 LRESULT WINAPI WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+inline bool is_left_shift_down = false;
+inline bool is_right_shift_down = false;
+
+HWND hWnd;
+void showHideWindow(bool show);
+
 int main() 
 {
     //make process DPI aware and obtain main monitor scale
@@ -41,7 +47,7 @@ int main()
     //using win32 api to create a handle for a new window
     WNDCLASSEXW wc = { sizeof(wc), CS_CLASSDC, WinProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"Dog Ate My Mouse", nullptr };
     ::RegisterClassExW(&wc);
-    HWND hWnd = ::CreateWindowExW(WS_EX_TOPMOST | WS_EX_LAYERED, wc.lpszClassName, L"Dog ate my mouse", WS_POPUP, 0, 0, win_x, win_y, nullptr, nullptr, wc.hInstance, nullptr);
+    hWnd = ::CreateWindowExW(WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TRANSPARENT, wc.lpszClassName, L"Dog ate my mouse", WS_POPUP, 0, 0, win_x, win_y, nullptr, nullptr, wc.hInstance, nullptr);
 
     MARGINS margins = { -1, -1, -1,-1 };
     ::DwmExtendFrameIntoClientArea(hWnd, &margins);
@@ -54,8 +60,7 @@ int main()
     }
 
     //hide the window
-    ::ShowWindow(hWnd, SW_HIDE);
-    ::UpdateWindow(hWnd);
+    showHideWindow(false);
 
     //setup Dear ImGui contexnt
     IMGUI_CHECKVERSION();
@@ -205,22 +210,71 @@ LRESULT WINAPI WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
     switch (msg)
     {
-    case WM_SIZE:
-        if (wParam == SIZE_MINIMIZED) {
+        case WM_SIZE:
+            if (wParam == SIZE_MINIMIZED) {
+            }
+            break;
+        case WM_KEYDOWN:
+        {
+            switch (wParam) {
+            case VK_ESCAPE:
+            {
+                ::PostQuitMessage(0);
+                return 0;
+            }
+            case VK_LSHIFT:
+            {
+                is_left_shift_down = true;
+                break;
+            }
+            case VK_RSHIFT:
+            {
+                is_right_shift_down = true;
+                break;
+            }
+            }
+
+            break;
         }
-        break;
-    case WM_KEYDOWN: 
-    {
-        if (wParam == VK_ESCAPE)
+        case WM_KEYUP:
+        {
+            switch (wParam)
+            {
+                case VK_LSHIFT:
+                {
+                    is_left_shift_down = false;
+                    showHideWindow(false);
+                    break;
+                }
+                case VK_RSHIFT:
+                {
+                    is_left_shift_down = false;
+                    showHideWindow(false);
+                    break;
+                }
+
+                default:break;
+            }
+        }
+        case WM_DESTROY:
         {
             ::PostQuitMessage(0);
             return 0;
         }
-        break;
     }
-    case WM_DESTROY:
-        ::PostQuitMessage(0);
-        return 0;
+
+    if (is_left_shift_down && is_right_shift_down)
+    {
+        showHideWindow(true);
     }
+
     return ::DefWindowProcW(hWnd, msg, wParam, lParam);
 }
+
+void showHideWindow(bool show)
+{
+    int mode = show ? SW_SHOWDEFAULT : SW_HIDE;
+    ::ShowWindow(hWnd, mode);
+    ::UpdateWindow(hWnd);
+}
+
