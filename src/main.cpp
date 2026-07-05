@@ -278,3 +278,31 @@ void showHideWindow(bool show)
     ::UpdateWindow(hWnd);
 }
 
+HHOOK hKeyboardHook = nullptr;
+LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
+{
+    if (nCode == HC_ACTION)
+    {
+        //TODO add logic for external keyboard presses 
+    }
+    return ::CallNextHookEx(hKeyboardHook, nCode, wParam, lParam);
+}
+
+void SetupKeyboardHooks()
+{
+    HINSTANCE hInstance = ::GetModuleHandle(NULL);
+
+    hKeyboardHook = ::SetWindowsHookEx(WH_KEYBOARD, LowLevelKeyboardProc, hInstance, 0);
+
+    assert(hKeyboardHook);
+}
+
+void CleanupKeyboardHooks()
+{
+    if (hKeyboardHook != nullptr)
+    {
+        ::UnhookWindowsHookEx(hKeyboardHook);
+        hKeyboardHook = nullptr;
+    }
+}
+
