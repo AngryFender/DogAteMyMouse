@@ -33,8 +33,13 @@ inline bool is_right_shift_down = false;
 HWND hWnd;
 void showHideWindow(bool show);
 
+void SetupKeyboardHooks();
+void CleanupKeyboardHooks();
+
 int main() 
 {
+    SetupKeyboardHooks();
+
     //make process DPI aware and obtain main monitor scale
     ImGui_ImplWin32_EnableDpiAwareness();
     float main_scale = ImGui_ImplWin32_GetDpiScaleForMonitor(
@@ -139,7 +144,8 @@ int main()
 
     CleanupDeviceD3D();
     ::UnregisterClassW(wc.lpszClassName, wc.hInstance);
-
+    
+    CleanupKeyboardHooks();
     return 0;
 }
 
@@ -222,39 +228,9 @@ LRESULT WINAPI WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 ::PostQuitMessage(0);
                 return 0;
             }
-            case VK_LSHIFT:
-            {
-                is_left_shift_down = true;
-                break;
-            }
-            case VK_RSHIFT:
-            {
-                is_right_shift_down = true;
-                break;
-            }
             }
 
             break;
-        }
-        case WM_KEYUP:
-        {
-            switch (wParam)
-            {
-                case VK_LSHIFT:
-                {
-                    is_left_shift_down = false;
-                    showHideWindow(false);
-                    break;
-                }
-                case VK_RSHIFT:
-                {
-                    is_left_shift_down = false;
-                    showHideWindow(false);
-                    break;
-                }
-
-                default:break;
-            }
         }
         case WM_DESTROY:
         {
@@ -283,8 +259,53 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
     if (nCode == HC_ACTION)
     {
-        //TODO add logic for external keyboard presses 
+        if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN)
+        {
+            KBDLLHOOKSTRUCT* pKey = (KBDLLHOOKSTRUCT*)lParam;
+            switch (pKey->vkCode)
+            {
+            case VK_LSHIFT:
+            {
+                is_left_shift_down = true;
+                break;
+            }
+            case VK_RSHIFT:
+            {
+                is_right_shift_down = true;
+                break;
+            }
+            default:break;
+            }
+        }
+        else if (wParam == WM_KEYUP || wParam == WM_SYSKEYUP)
+        {
+            KBDLLHOOKSTRUCT* pKey = (KBDLLHOOKSTRUCT*)lParam;
+            switch (pKey->vkCode)
+            {
+            case VK_LSHIFT:
+            {
+                is_left_shift_down = false;
+                showHideWindow(false);
+                break;
+            }
+            case VK_RSHIFT:
+            {
+                is_right_shift_down = false;
+                showHideWindow(false);
+                break;
+            }
+
+            default:break;
+            }
+        }
     }
+   
+    if (is_left_shift_down && is_right_shift_down)
+    {
+        showHideWindow(true);
+    }
+
+    //TODO add logic for external keyboard presses 
     return ::CallNextHookEx(hKeyboardHook, nCode, wParam, lParam);
 }
 
@@ -292,9 +313,10 @@ void SetupKeyboardHooks()
 {
     HINSTANCE hInstance = ::GetModuleHandle(NULL);
 
-    hKeyboardHook = ::SetWindowsHookEx(WH_KEYBOARD, LowLevelKeyboardProc, hInstance, 0);
+    hKeyboardHook = ::SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInstance, 0);
 
-    assert(hKeyboardHook);
+    if(!hKeyboardHook)
+        assert(hKeyboardHook);
 }
 
 void CleanupKeyboardHooks()
