@@ -304,7 +304,7 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
     if (is_left_shift_down && is_right_shift_down)
     {
         HBITMAP screenshot = TakeScreenshot();
-        assert(screenshot, "Screenshot failure");
+        assert(screenshot && "Screenshot failure");
         showHideWindow(true);
     }
 
@@ -316,7 +316,7 @@ void SetupKeyboardHooks()
 {
     HINSTANCE hInstance = ::GetModuleHandle(NULL);
     hKeyboardHook = ::SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInstance, 0);
-    assert(hKeyboardHook, "Keyboard low level hook proc couldn't be set");
+    assert(hKeyboardHook && "Keyboard low level hook proc couldn't be set");
 }
 
 void CleanupKeyboardHooks()

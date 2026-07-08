@@ -24,6 +24,9 @@ set(IMGUI_SOURCES
   ${IMGUI_DIR}/backend/imgui_impl_win32.cpp
 )
 
+find_package(OpenCV REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS})
+
 # Add source to this project's executable.
 add_executable (${PROJECT_NAME} 
     "src/main.cpp"
@@ -38,7 +41,5 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_link_libraries(${PROJECT_NAME}
   d3d11
   dxgi
+  ${OpenCV_LIBS}
 )
-
-
-# TODO: Add tests and install targets if needed.
