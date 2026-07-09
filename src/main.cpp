@@ -52,7 +52,7 @@ int main()
     //using win32 api to create a handle for a new window
     WNDCLASSEXW wc = { sizeof(wc), CS_CLASSDC, WinProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"Dog Ate My Mouse", nullptr };
     ::RegisterClassExW(&wc);
-    hWnd = ::CreateWindowExW(WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TRANSPARENT, wc.lpszClassName, L"Dog ate my mouse", WS_POPUP, 0, 0, win_x, win_y, nullptr, nullptr, wc.hInstance, nullptr);
+    hWnd = ::CreateWindowExW(WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW, wc.lpszClassName, L"Dog ate my mouse", WS_POPUP, 0, 0, win_x, win_y, nullptr, nullptr, wc.hInstance, nullptr);
 
     MARGINS margins = { -1, -1, -1,-1 };
     ::DwmExtendFrameIntoClientArea(hWnd, &margins);
