@@ -13,7 +13,7 @@
 #include <fstream>
 
 //hide the console window
-#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup" )
+//#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup" )
 
 //allocate memory and create resources in the gpu
 inline ID3D11Device* g_pd3dDevice = nullptr;
@@ -36,6 +36,8 @@ LRESULT WINAPI WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 inline bool is_left_shift_down = false;
 inline bool is_right_shift_down = false;
 inline bool is_windows_visible = false;
+
+inline std::vector<std::pair<float, float>> points;
 
 HWND hWnd;
 void showHideWindow(bool show);
@@ -120,12 +122,18 @@ int main()
 
         //Bypass the ImGUI windows system and get the background canvas
         ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
-
-        draw_list->AddText(
-            ImVec2(1200.0f, 1200.0f),
-            IM_COL32(255,0,0,255),
-            "Tests"
-        );
+        
+        
+        if (is_windows_visible)
+        {
+            for (auto& point : points) {
+                draw_list->AddText(
+                    ImVec2(point.first, point.second),
+                    IM_COL32(255, 0, 0, 255),
+                    "Tests"
+                );
+            }
+        }
         
         //rendering
         ImGui::Render();
@@ -248,6 +256,9 @@ void showHideWindow(bool show)
 }
 
 HBITMAP TakeScreenshot();
+cv::Mat HBITMAPToMat(HBITMAP hBitmap);
+std::vector<std::pair<float, float>> Detect(cv::Mat image);
+
 HHOOK hKeyboardHook = nullptr;
 LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
