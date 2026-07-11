@@ -5,6 +5,12 @@
 #include <tchar.h>
 #include <Windows.h>
 #include <dwmapi.h>
+#include <vector>
+#include <opencv2/opencv.hpp>
+#include <opencv2/features2d.hpp>
+#include <opencv2/objdetect.hpp>
+#include <iostream>
+#include <fstream>
 
 //hide the console window
 #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup" )
@@ -29,6 +35,7 @@ LRESULT WINAPI WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 inline bool is_left_shift_down = false;
 inline bool is_right_shift_down = false;
+inline bool is_windows_visible = false;
 
 HWND hWnd;
 void showHideWindow(bool show);
@@ -39,6 +46,7 @@ void CleanupKeyboardHooks();
 int main() 
 {
     SetupKeyboardHooks();
+    SetProcessDPIAware();
 
     //make process DPI aware and obtain main monitor scale
     ImGui_ImplWin32_EnableDpiAwareness();
@@ -220,28 +228,11 @@ LRESULT WINAPI WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             if (wParam == SIZE_MINIMIZED) {
             }
             break;
-        case WM_KEYDOWN:
-        {
-            switch (wParam) {
-            case VK_ESCAPE:
-            {
-                ::PostQuitMessage(0);
-                return 0;
-            }
-            }
-
-            break;
-        }
         case WM_DESTROY:
         {
             ::PostQuitMessage(0);
             return 0;
         }
-    }
-
-    if (is_left_shift_down && is_right_shift_down)
-    {
-        showHideWindow(true);
     }
 
     return ::DefWindowProcW(hWnd, msg, wParam, lParam);
@@ -252,6 +243,8 @@ void showHideWindow(bool show)
     int mode = show ? SW_SHOWDEFAULT : SW_HIDE;
     ::ShowWindow(hWnd, mode);
     ::UpdateWindow(hWnd);
+
+    is_windows_visible = show;
 }
 
 HBITMAP TakeScreenshot();
@@ -275,35 +268,23 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
                 is_right_shift_down = true;
                 break;
             }
-            default:break;
-            }
-        }
-        else if (wParam == WM_KEYUP || wParam == WM_SYSKEYUP)
-        {
-            KBDLLHOOKSTRUCT* pKey = (KBDLLHOOKSTRUCT*)lParam;
-            switch (pKey->vkCode)
+            case VK_ESCAPE:
             {
-            case VK_LSHIFT:
-            {
-                is_left_shift_down = false;
-                showHideWindow(false);
-                break;
+                if (is_windows_visible) {
+                    is_left_shift_down = false;
+                    is_right_shift_down = false;
+                    showHideWindow(false);
+                }
             }
-            case VK_RSHIFT:
-            {
-                is_right_shift_down = false;
-                showHideWindow(false);
-                break;
-            }
-
             default:break;
             }
         }
     }
    
-    if (is_left_shift_down && is_right_shift_down)
+    if (is_left_shift_down && is_right_shift_down && !is_windows_visible)
     {
         HBITMAP screenshot = TakeScreenshot();
+        points = Detect(HBITMAPToMat(screenshot));
         assert(screenshot && "Screenshot failure");
         showHideWindow(true);
     }
