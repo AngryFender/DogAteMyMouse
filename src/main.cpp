@@ -363,6 +363,62 @@ HBITMAP TakeScreenshot()
     return hBitmap;
 }
 
+
+std::vector<std::pair<float, float>> Detect(cv::Mat image)
+{
+    std::cout << "Detecting\n";
+    std::vector<std::pair<float, float>> result;
+    result.reserve(100);
+
+    cv::Mat gray;
+    cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+
+    cv::Ptr<cv::MSER> mser = cv::MSER::create(
+        2,
+        100,
+        14400,
+        .5,
+        .0002,
+        5,
+        1.01,
+        0.003,
+        5
+    );
+
+    std::vector<std::vector<cv::Point>> regions;
+    std::vector<cv::Rect> rects;
+
+    mser->detectRegions(gray, regions, rects);
+
+    int validPoint = 0;
+    for (size_t i = 0; i < rects.size(); ++i) 
+    {
+        const cv::Rect& rect = rects[i];
+        double aspectRatio = (double)rect.width / (double)rect.height;
+        bool isNotTooThin = (aspectRatio > 0.5 && aspectRatio < 3.0);
+        bool isNotTooBig = rect.area() < (image.cols * image.rows * 0.5);
+
+        if (isNotTooThin && isNotTooBig)
+        {
+            validPoint++;
+            result.emplace_back(
+                std::pair<float, float>(
+                    (float)rect.x + (float)(rect.width)/2, 
+                    (float)rect.y + (float)(rect.height)/2
+                )
+            );
+            std::cout
+                << " x = " << ((float)rect.x + (float)(rect.width) / 2)
+                << " y = " << ((float)rect.y + (float)(rect.height) / 2)
+                << std::endl;
+        }
+    }
+ 
+    std::cout << "Found " << result.size() << " valid elements.\n";
+    return result;
+}
+
+
 cv::Mat HBITMAPToMat(HBITMAP hBitmap) 
 {
     BITMAP bmp;
