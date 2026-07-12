@@ -441,19 +441,32 @@ cv::Mat HBITMAPToMat(HBITMAP hBitmap)
     return mat;
 }
 
+void SaveImage(const cv::Mat& mat, const std::string& filename) 
+{
+    if (!mat.empty()) 
+    {
+        cv::imwrite(filename, mat);
+    }
+}
+
 std::vector<std::pair<float, float>> DetectUIWithCCA(const cv::Mat& image)
 {
     std::vector<std::pair<float, float>> result;
+
+    cv::Mat original = image.clone();
 
     cv::Mat gray, binary;
     cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
 
     cv::adaptiveThreshold(gray, binary, 255,
         cv::ADAPTIVE_THRESH_GAUSSIAN_C,
-        cv::THRESH_BINARY_INV, 11, 2);
+        cv::THRESH_BINARY_INV, 3, 1);
+    SaveImage(gray, "c:\\temp\\1.bmp");
 
     cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
     cv::morphologyEx(binary, binary, cv::MORPH_CLOSE, kernel);
+
+    SaveImage(binary, "c:\\temp\\2.bmp");
 
     cv::Mat labels, stats, centroids;
     int numLabels = cv::connectedComponentsWithStats(binary, labels, stats, centroids, 8, CV_32S);
@@ -468,16 +481,21 @@ std::vector<std::pair<float, float>> DetectUIWithCCA(const cv::Mat& image)
 
         double aspectRatio = (double)width / height;
         bool isNotTooThin = (aspectRatio > 0.5 && aspectRatio < 6.0);
-        bool isRightSize = (area > 200 && area < 50000);
+        bool isRightSize = (area > 100 && area < 50000);
 
-        if (isNotTooThin && isRightSize)
+        if (isRightSize)
         {
             // CCA automatically calculates perfect centroids for us!
             float centerX = centroids.at<double>(i, 0);
             float centerY = centroids.at<double>(i, 1);
             result.emplace_back(centerX, centerY);
+
+            cv::rectangle(original, cv::Rect(x, y, width, height), cv::Scalar(0,0, 255,255), 5);
         }
     }
+
+    SaveImage(original, "c:\\temp\\3.bmp");
+
     std::cout << "CCA found " << result.size() << " elements.\n";
     return result;
 }
