@@ -130,7 +130,7 @@ int main()
                 draw_list->AddText(
                     ImVec2(point.first, point.second),
                     IM_COL32(255, 0, 0, 255),
-                    "Tests"
+                    "jk"
                 );
             }
         }
@@ -258,7 +258,7 @@ void showHideWindow(bool show)
 HBITMAP TakeScreenshot();
 cv::Mat HBITMAPToMat(HBITMAP hBitmap);
 std::vector<std::pair<float, float>> Detect(cv::Mat image);
-
+std::vector<std::pair<float, float>> DetectUIWithCCA(const cv::Mat& image);
 HHOOK hKeyboardHook = nullptr;
 LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
@@ -295,7 +295,8 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
     if (is_left_shift_down && is_right_shift_down && !is_windows_visible)
     {
         HBITMAP screenshot = TakeScreenshot();
-        points = Detect(HBITMAPToMat(screenshot));
+        //points = Detect(HBITMAPToMat(screenshot));
+        points = DetectUIWithCCA(HBITMAPToMat(screenshot));
         assert(screenshot && "Screenshot failure");
         showHideWindow(true);
     }
@@ -439,3 +440,45 @@ cv::Mat HBITMAPToMat(HBITMAP hBitmap)
 
     return mat;
 }
+
+std::vector<std::pair<float, float>> DetectUIWithCCA(const cv::Mat& image)
+{
+    std::vector<std::pair<float, float>> result;
+
+    cv::Mat gray, binary;
+    cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+
+    cv::adaptiveThreshold(gray, binary, 255,
+        cv::ADAPTIVE_THRESH_GAUSSIAN_C,
+        cv::THRESH_BINARY_INV, 11, 2);
+
+    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
+    cv::morphologyEx(binary, binary, cv::MORPH_CLOSE, kernel);
+
+    cv::Mat labels, stats, centroids;
+    int numLabels = cv::connectedComponentsWithStats(binary, labels, stats, centroids, 8, CV_32S);
+
+    for (int i = 1; i < numLabels; i++)
+    {
+        int x = stats.at<int>(i, cv::CC_STAT_LEFT);
+        int y = stats.at<int>(i, cv::CC_STAT_TOP);
+        int width = stats.at<int>(i, cv::CC_STAT_WIDTH);
+        int height = stats.at<int>(i, cv::CC_STAT_HEIGHT);
+        int area = stats.at<int>(i, cv::CC_STAT_AREA);
+
+        double aspectRatio = (double)width / height;
+        bool isNotTooThin = (aspectRatio > 0.5 && aspectRatio < 6.0);
+        bool isRightSize = (area > 200 && area < 50000);
+
+        if (isNotTooThin && isRightSize)
+        {
+            // CCA automatically calculates perfect centroids for us!
+            float centerX = centroids.at<double>(i, 0);
+            float centerY = centroids.at<double>(i, 1);
+            result.emplace_back(centerX, centerY);
+        }
+    }
+    std::cout << "CCA found " << result.size() << " elements.\n";
+    return result;
+}
+
