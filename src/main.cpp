@@ -232,10 +232,10 @@ LRESULT WINAPI WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
     switch (msg)
     {
-        case WM_SIZE:
-            if (wParam == SIZE_MINIMIZED) {
-            }
-            break;
+        case WM_CHAR:
+        {
+            //TODO call match_target method here
+        }
         case WM_DESTROY:
         {
             ::PostQuitMessage(0);

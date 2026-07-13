@@ -30,7 +30,9 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 # Add source to this project's executable.
 add_executable (${PROJECT_NAME} 
     "src/main.cpp"
-    ${IMGUI_SOURCES}
+    ${IMGUI_SOURCES}    
+    "src/interfaces/imatchengine.h"  
+    "src/matchengine.h"
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
