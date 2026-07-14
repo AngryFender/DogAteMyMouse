@@ -33,6 +33,7 @@ add_executable (${PROJECT_NAME}
     ${IMGUI_SOURCES}    
     "src/interfaces/imatchengine.h"  
     "src/matchengine.h"
+    "src/interfaces/ikeygen.h"
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
