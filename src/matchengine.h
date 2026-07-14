@@ -3,14 +3,21 @@
 #include "./interfaces/imatchengine.h"
 #include <queue>
 #include <unordered_map>
+#include <memory>
+#include <utility>
 
-constexpr size_t BUFFER_SIZE = 2;
+inline uint16_t char_into_uint16_t(char high, char low)
+{
+    return static_cast<uint16_t>(high) << 8 | static_cast<uint16_t>(low);
+}
 
 class MatchEngine final : public IMatchEngine 
 {
 public:
-    ~MatchEngine() = default;
-    MatchEngine() = default;
+    ~MatchEngine() override = default;
+    MatchEngine(std::unique_ptr<IKeyGen>&& keygen) :keygen_(std::move(keygen))
+    {
+    }
 
     std::optional<std::pair<float, float>> match_target(const char key) override
     {
@@ -20,23 +27,39 @@ public:
         if (buffer_.size() > BUFFER_SIZE)
             buffer_.pop();
 
-        uint16_t key = static_cast<uint16_t>(buffer_.front()) << 8 | static_cast<uint16_t>(buffer_.back());
+        uint16_t key = char_into_uint16_t(buffer_.front(), buffer_.back());
         if (map_.contains(key))
             result = map_[key];
         
         return result;
     }
 
-    std::vector<std::string> get_targets(const std::vector<std::pair<float, float>>& points) override
+    std::vector<Key> get_targets(const std::vector<std::pair<float, float>>& points) override
     {
-        std::vector<std::string> result;
+        map_.clear();
 
-        return result;
+        std::vector<Key> targets;
+        targets = keygen_->generate(points.size());
+
+        if (points.size() == targets.size())
+        {
+            for (int i = 0; i < points.size(); ++i)
+            {
+                uint16_t key = char_into_uint16_t(*targets[i].data(), *targets[i].data() + 1);
+                map_[key] = points[i];
+            }
+        }
+        else
+        {
+            targets.clear();
+        }
+
+        return targets;
     }
 
 private:
     std::queue<char> buffer_;
-    std::vector<std::string>& targets_;
     std::unordered_map<uint16_t, std::pair<float, float>> map_;
+    std::unique_ptr<IKeyGen> keygen_;
 
 };
