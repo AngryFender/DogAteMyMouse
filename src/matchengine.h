@@ -36,25 +36,29 @@ public:
 
     std::vector<Key> get_targets(const std::vector<std::pair<float, float>>& points) override
     {
+        const size_t size = points.size();
         map_.clear();
+        map_.reserve(size);
 
-        std::vector<Key> targets;
-        targets = keygen_->generate(points.size());
+        std::vector<Key> keys;
+        keys.reserve(size);
 
-        if (points.size() == targets.size())
+        keys = keygen_->generate(points);
+
+        if (keys.size() == size)
         {
-            for (int i = 0; i < points.size(); ++i)
+            for (int i = 0; i < size; ++i)
             {
-                uint16_t key = char_into_uint16_t(*targets[i].data(), *targets[i].data() + 1);
+                uint16_t key = char_into_uint16_t(*keys[i].data(), *keys[i].data() + 1);
                 map_[key] = points[i];
             }
         }
         else
         {
-            targets.clear();
+            keys.clear();
         }
 
-        return targets;
+        return keys;
     }
 
 private:
