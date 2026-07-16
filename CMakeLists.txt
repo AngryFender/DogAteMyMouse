@@ -35,6 +35,7 @@ add_executable (${PROJECT_NAME}
     "src/matchengine.h"
     "src/interfaces/ikeygen.h"
     "src/keygen.h"
+    "src/entity.h"
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
