@@ -19,11 +19,11 @@ public:
     {
     }
 
-    std::optional<std::pair<float, float>> match_target(const char key) override
+    std::optional<std::pair<float, float>> match_target(const char keypress) override
     {
         std::optional<std::pair<float, float>> result = std::nullopt;
 
-        buffer_.push(key);
+        buffer_.push(keypress);
         if (buffer_.size() > BUFFER_SIZE)
             buffer_.pop();
 
@@ -34,7 +34,7 @@ public:
         return result;
     }
 
-    std::vector<Key> get_targets(const std::vector<std::pair<float, float>>& points) override
+    std::vector<Key> get_targets(const std::vector<std::pair<float, float>>& points, const ScreenInfo& info) override
     {
         const size_t size = points.size();
         map_.clear();
@@ -43,13 +43,14 @@ public:
         std::vector<Key> keys;
         keys.reserve(size);
 
-        keys = keygen_->generate(points);
+        keys = keygen_->generate(points, info);
 
         if (keys.size() == size)
         {
             for (int i = 0; i < size; ++i)
             {
-                uint16_t key = char_into_uint16_t(*keys[i].data(), *keys[i].data() + 1);
+                const auto& data = keys[i];
+                uint16_t key = char_into_uint16_t(data[0], data[0] + 1);
                 map_[key] = points[i];
             }
         }
