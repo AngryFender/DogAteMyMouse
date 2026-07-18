@@ -24,12 +24,22 @@ public:
         std::optional<std::pair<float, float>> result = std::nullopt;
 
         buffer_.push(keypress);
+
+        if (buffer_.size() < BUFFER_SIZE)
+            return result;
+
         if (buffer_.size() > BUFFER_SIZE)
             buffer_.pop();
 
         uint16_t key = char_into_uint16_t(buffer_.front(), buffer_.back());
         if (map_.contains(key))
+        {
             result = map_[key];
+            while (!buffer_.empty()) 
+            {
+                buffer_.pop();
+            }
+        }
         
         return result;
     }
