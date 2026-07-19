@@ -20,4 +20,31 @@ struct KeyHasher
     }
 };
 
-constexpr size_t COMBINATION = 30 * 30;
+constexpr size_t TOTAL_CHAR = 30;
+constexpr size_t TOTAL_COMBINATION = TOTAL_CHAR * TOTAL_CHAR;
+
+constexpr std::array<char, 30> CHAR_POOL{ 
+    'q','w','e','r','t', 'y','u','i','p','o', 
+    'a','s','d','f','g', 'h','j','k','l',';', 
+    'z','x','c','v','b', 'n','m',',','.','/' 
+};
+
+using PossibleCombo = std::array<Key, TOTAL_COMBINATION>;
+
+constexpr PossibleCombo generate_all_combinations()
+{
+    PossibleCombo combo{};
+    int index = 0;
+    for (char first : CHAR_POOL)
+    {
+        for (char second : CHAR_POOL)
+        {
+            combo[index] = { first, second };
+            ++index;
+        }
+    }
+
+    return combo;
+};
+
+constexpr PossibleCombo ALL_COMBINATION = generate_all_combinations();
