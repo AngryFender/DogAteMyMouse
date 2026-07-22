@@ -1,6 +1,7 @@
 #include "imgui.h"
 #include "imgui_impl_dx11.h"
 #include "imgui_impl_win32.h"
+#include "entity.h"
 #include <d3d11.h>
 #include <tchar.h>
 #include <Windows.h>
@@ -38,6 +39,8 @@ inline bool is_right_shift_down = false;
 inline bool is_windows_visible = false;
 
 inline std::vector<std::pair<float, float>> points;
+std::vector<Key> keys;
+ScreenInfo screen;
 
 HWND hWnd;
 void showHideWindow(bool show);
@@ -47,6 +50,8 @@ void CleanupKeyboardHooks();
 
 int main() 
 {
+    points.reserve(TOTAL_COMBINATION);
+    keys.reserve(TOTAL_COMBINATION);
     SetupKeyboardHooks();
     SetProcessDPIAware();
 
@@ -56,13 +61,13 @@ int main()
         ::MonitorFromPoint(POINT{ 0,0 }, MONITOR_DEFAULTTOPRIMARY)
     );
 
-    auto win_x = ::GetSystemMetrics(SM_CXSCREEN);
-    auto win_y = ::GetSystemMetrics(SM_CYSCREEN);
+    screen.width = ::GetSystemMetrics(SM_CXSCREEN);
+    screen.height  = ::GetSystemMetrics(SM_CYSCREEN);
 
     //using win32 api to create a handle for a new window
     WNDCLASSEXW wc = { sizeof(wc), CS_CLASSDC, WinProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"Dog Ate My Mouse", nullptr };
     ::RegisterClassExW(&wc);
-    hWnd = ::CreateWindowExW(WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW, wc.lpszClassName, L"Dog ate my mouse", WS_POPUP, 0, 0, win_x, win_y, nullptr, nullptr, wc.hInstance, nullptr);
+    hWnd = ::CreateWindowExW(WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW, wc.lpszClassName, L"Dog ate my mouse", WS_POPUP, 0, 0, screen.width, screen.height, nullptr, nullptr, wc.hInstance, nullptr);
 
     MARGINS margins = { -1, -1, -1,-1 };
     ::DwmExtendFrameIntoClientArea(hWnd, &margins);
