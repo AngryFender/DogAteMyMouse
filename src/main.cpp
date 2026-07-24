@@ -1,6 +1,9 @@
 #include "imgui.h"
 #include "imgui_impl_dx11.h"
 #include "imgui_impl_win32.h"
+#include "./interfaces/ikeygen.h"
+#include "matchengine.h"
+#include "keygen.h"
 #include "entity.h"
 #include <d3d11.h>
 #include <tchar.h>
@@ -41,6 +44,7 @@ inline bool is_windows_visible = false;
 inline std::vector<std::pair<float, float>> points;
 std::vector<Key> keys;
 ScreenInfo screen;
+MatchEngine engine(std::make_unique<KeyGen>());
 
 HWND hWnd;
 void showHideWindow(bool show);
@@ -131,12 +135,15 @@ int main()
         
         if (is_windows_visible)
         {
-            for (auto& point : points) {
+            for (int i = 0; i < points.size(); ++i)
+            {
+                const auto& point = points[i];
+                const auto& key = keys[i];
                 draw_list->AddText(
                     ImVec2(point.first, point.second),
                     IM_COL32(255, 0, 0, 255),
-                    "jk"
-                );
+                    key.data(), key.data()+2
+                    );
             }
         }
         
@@ -227,6 +234,7 @@ void CleanupRenderTarget()
 // Forward declare message handler from imgui_impl_win32.cpp
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+void ClickAtPixel(int x, int y);
 // Win32 message handler
 LRESULT WINAPI WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 {
@@ -240,6 +248,18 @@ LRESULT WINAPI WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         case WM_CHAR:
         {
             //TODO call match_target method here
+            auto result = engine.match_target(wParam);
+            if (result)
+            {   
+                auto value = result.value();
+                std::cout <<"its a match !!! -> "<< value.first << " , " << value.second << "\n";
+                is_left_shift_down = false;
+                is_right_shift_down = false;
+                showHideWindow(false);
+
+                ClickAtPixel(value.first, value.second);
+            }
+            break;
         }
         case WM_DESTROY:
         {
@@ -302,6 +322,7 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
         HBITMAP screenshot = TakeScreenshot();
         //points = Detect(HBITMAPToMat(screenshot));
         points = DetectUIWithCCA(HBITMAPToMat(screenshot));
+        keys = engine.get_targets(points, screen);
         assert(screenshot && "Screenshot failure");
         showHideWindow(true);
     }

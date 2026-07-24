@@ -5,10 +5,13 @@
 #include <unordered_map>
 #include <memory>
 #include <utility>
+#include <iostream>
 
 inline uint16_t char_into_uint16_t(char high, char low)
 {
-    return static_cast<uint16_t>(high) << 8 | static_cast<uint16_t>(low);
+    auto data =  static_cast<uint16_t>(high) << 8 | static_cast<uint16_t>(low);
+    std::cout << "Key = " << data << " for " << high << low << "\n";
+    return data;
 }
 
 class MatchEngine final : public IMatchEngine 
