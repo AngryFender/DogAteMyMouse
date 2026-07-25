@@ -9,9 +9,7 @@
 
 inline uint16_t char_into_uint16_t(char high, char low)
 {
-    auto data =  static_cast<uint16_t>(high) << 8 | static_cast<uint16_t>(low);
-    std::cout << "Key = " << data << " for " << high << low << "\n";
-    return data;
+    return static_cast<uint16_t>(high) << 8 | static_cast<uint16_t>(low);
 }
 
 class MatchEngine final : public IMatchEngine 
@@ -62,8 +60,8 @@ public:
         {
             for (int i = 0; i < size; ++i)
             {
-                const auto& data = keys[i];
-                uint16_t key = char_into_uint16_t(data[0], data[0] + 1);
+                const Key& data = keys[i];
+                uint16_t key = char_into_uint16_t(data[0], data[1]);
                 map_[key] = points[i];
             }
         }
