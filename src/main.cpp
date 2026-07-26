@@ -44,7 +44,7 @@ inline bool is_windows_visible = false;
 inline std::vector<std::pair<float, float>> points;
 std::vector<Key> keys;
 ScreenInfo screen;
-MatchEngine engine(std::make_unique<KeyGen>());
+MatchEngine engine(std::make_unique<KeyGen>(ALL_COMBINATION));
 
 HWND hWnd;
 void showHideWindow(bool show);
