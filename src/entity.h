@@ -24,8 +24,8 @@ constexpr size_t TOTAL_CHAR = 30;
 constexpr size_t TOTAL_COMBINATION = TOTAL_CHAR * TOTAL_CHAR;
 
 constexpr std::array<char, 30> CHAR_POOL{ 
+    'j','f','d','k','l', 's','a','h','g',';', 
     'q','w','e','r','t', 'y','u','i','p','o', 
-    'a','s','d','f','g', 'h','j','k','l',';', 
     'z','x','c','v','b', 'n','m',',','.','/' 
 };
 
