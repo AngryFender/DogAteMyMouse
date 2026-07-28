@@ -252,7 +252,6 @@ LRESULT WINAPI WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             if (result)
             {   
                 auto value = result.value();
-                std::cout <<"its a match !!! -> "<< value.first << " , " << value.second << "\n";
                 is_left_shift_down = false;
                 is_right_shift_down = false;
                 showHideWindow(false);
@@ -385,7 +384,6 @@ HBITMAP TakeScreenshot()
 
 std::vector<std::pair<float, float>> Detect(cv::Mat image)
 {
-    std::cout << "Detecting\n";
     std::vector<std::pair<float, float>> result;
     result.reserve(100);
 
@@ -480,7 +478,6 @@ std::vector<std::pair<float, float>> DetectUIWithCCA(const cv::Mat& image)
     std::vector<std::pair<float, float>> result;
 
     cv::Mat original = image.clone();
-
     cv::Mat gray, binary;
     cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
 
@@ -491,11 +488,13 @@ std::vector<std::pair<float, float>> DetectUIWithCCA(const cv::Mat& image)
 
     cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
     cv::morphologyEx(binary, binary, cv::MORPH_CLOSE, kernel);
-
     SaveImage(binary, "c:\\temp\\2.bmp");
 
     cv::Mat labels, stats, centroids;
     int numLabels = cv::connectedComponentsWithStats(binary, labels, stats, centroids, 8, CV_32S);
+
+    // Define how close (in pixels) two elements can be before we consider them the "same" object
+    const float MIN_DISTANCE = 25.0f; 
 
     for (int i = 1; i < numLabels; i++)
     {
@@ -509,20 +508,40 @@ std::vector<std::pair<float, float>> DetectUIWithCCA(const cv::Mat& image)
         bool isNotTooThin = (aspectRatio > 0.5 && aspectRatio < 6.0);
         bool isRightSize = (area > 100 && area < 50000);
 
-        if (isRightSize)
+        // Fixed: Now we actually use your isNotTooThin variable!
+        if (isRightSize && isNotTooThin) 
         {
-            // CCA automatically calculates perfect centroids for us!
             float centerX = centroids.at<double>(i, 0);
             float centerY = centroids.at<double>(i, 1);
-            result.emplace_back(centerX, centerY);
 
-            cv::rectangle(original, cv::Rect(x, y, width, height), cv::Scalar(0,0, 255,255), 5);
+            // Assume this new point is far away from everything
+            bool isTooClose = false;
+
+            // Compare it against every point we already saved
+            for (const auto& savedPoint : result) 
+            {
+                // std::hypot calculates the 2D distance between two points
+                float distance = std::hypot(centerX - savedPoint.first, centerY - savedPoint.second);
+                
+                if (distance < MIN_DISTANCE) 
+                {
+                    isTooClose = true;
+                    break; // Stop checking, we already know it's too close
+                }
+            }
+
+            // Only save and draw if it passed the distance test
+            if (!isTooClose) 
+            {
+                result.emplace_back(centerX, centerY);
+                cv::rectangle(original, cv::Rect(x, y, width, height), cv::Scalar(0,0, 255,255), 5);
+            }
         }
     }
 
     SaveImage(original, "c:\\temp\\3.bmp");
 
-    std::cout << "CCA found " << result.size() << " elements.\n";
+    std::cout << "CCA found " << result.size() << " unique elements.\n";
     return result;
 }
 
