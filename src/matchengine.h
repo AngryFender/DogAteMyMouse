@@ -25,7 +25,7 @@ public:
         std::optional<std::pair<float, float>> result = std::nullopt;
 
         buffer_.push(keypress);
-
+        
         if (buffer_.size() < BUFFER_SIZE)
             return result;
 
@@ -41,7 +41,10 @@ public:
                 buffer_.pop();
             }
         }
-        
+
+        while (!buffer_.empty()) {
+            buffer_.pop();
+        }
         return result;
     }
 
