@@ -17,7 +17,7 @@
 #include <fstream>
 
 //hide the console window
-//#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup" )
+#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup" )
 
 //allocate memory and create resources in the gpu
 inline ID3D11Device* g_pd3dDevice = nullptr;
@@ -247,17 +247,16 @@ LRESULT WINAPI WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
         case WM_CHAR:
         {
-            //TODO call match_target method here
-            auto result = engine.match_target(wParam);
-            if (result)
-            {   
-                auto value = result.value();
-                is_left_shift_down = false;
-                is_right_shift_down = false;
-                showHideWindow(false);
+            //auto result = engine.match_target(wParam);
+            //if (result)
+            //{   
+            //    auto value = result.value();
+            //    is_left_shift_down = false;
+            //    is_right_shift_down = false;
+            //    showHideWindow(false);
 
-                ClickAtPixel(value.first, value.second);
-            }
+            //    ClickAtPixel(value.first, value.second);
+            //}
             break;
         }
         case WM_DESTROY:
@@ -310,8 +309,45 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
                     is_right_shift_down = false;
                     showHideWindow(false);
                 }
+                break;
             }
-            default:break;
+            default:
+            {
+                BYTE keyboardState[256];
+                ::GetKeyboardState(keyboardState);
+
+                keyboardState[VK_SHIFT] = ::GetKeyState(VK_SHIFT) & 0x8000;
+                keyboardState[VK_CAPITAL] = ::GetKeyState(VK_CAPITAL) & 0x8000;
+                keyboardState[VK_CONTROL] = ::GetKeyState(VK_CONTROL) & 0x8000;
+                keyboardState[VK_MENU] = ::GetKeyState(VK_MENU) & 0x8000;
+
+                HKL keyboardLayout = ::GetKeyboardLayout(GetWindowThreadProcessId(GetForegroundWindow(), NULL));
+
+                WORD asciiChar = 0; 
+
+                int result = ToAsciiEx(
+                    pKey->vkCode, 
+                    pKey->scanCode, 
+                    keyboardState, 
+                    &asciiChar, 
+                    0, 
+                    keyboardLayout
+                );
+                if (result > 0)
+                {
+                    auto result = engine.match_target(asciiChar);
+                    if (result)
+                    {
+                        auto value = result.value();
+                        is_left_shift_down = false;
+                        is_right_shift_down = false;
+                        showHideWindow(false);
+
+                        ClickAtPixel(value.first, value.second);
+                        return 1;
+                    }
+                }
+            }
             }
         }
     }
