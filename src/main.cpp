@@ -243,27 +243,10 @@ LRESULT WINAPI WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         return true;
     }
 
-    switch (msg)
+    if (msg == WM_DESTROY)
     {
-        case WM_CHAR:
-        {
-            //auto result = engine.match_target(wParam);
-            //if (result)
-            //{   
-            //    auto value = result.value();
-            //    is_left_shift_down = false;
-            //    is_right_shift_down = false;
-            //    showHideWindow(false);
-
-            //    ClickAtPixel(value.first, value.second);
-            //}
-            break;
-        }
-        case WM_DESTROY:
-        {
-            ::PostQuitMessage(0);
-            return 0;
-        }
+        ::PostQuitMessage(0);
+        return 0;
     }
 
     return ::DefWindowProcW(hWnd, msg, wParam, lParam);
