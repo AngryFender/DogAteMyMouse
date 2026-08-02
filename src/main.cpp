@@ -13,7 +13,6 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/features2d.hpp>
 #include <opencv2/objdetect.hpp>
-#include <iostream>
 #include <fstream>
 
 //hide the console window
@@ -443,14 +442,9 @@ std::vector<std::pair<float, float>> Detect(cv::Mat image)
                     (float)rect.y + (float)(rect.height)/2
                 )
             );
-            std::cout
-                << " x = " << ((float)rect.x + (float)(rect.width) / 2)
-                << " y = " << ((float)rect.y + (float)(rect.height) / 2)
-                << std::endl;
         }
     }
  
-    std::cout << "Found " << result.size() << " valid elements.\n";
     return result;
 }
 
@@ -527,8 +521,8 @@ std::vector<std::pair<float, float>> DetectUIWithCCA(const cv::Mat& image)
         bool isNotTooThin = (aspectRatio > 0.5 && aspectRatio < 6.0);
         bool isRightSize = (area > 100 && area < 50000);
 
-        // Fixed: Now we actually use your isNotTooThin variable!
-        if (isRightSize && isNotTooThin) 
+        //if (isRightSize && isNotTooThin) 
+        if (isRightSize) 
         {
             float centerX = centroids.at<double>(i, 0);
             float centerY = centroids.at<double>(i, 1);
@@ -560,7 +554,6 @@ std::vector<std::pair<float, float>> DetectUIWithCCA(const cv::Mat& image)
 
     SaveImage(original, "c:\\temp\\3.bmp");
 
-    std::cout << "CCA found " << result.size() << " unique elements.\n";
     return result;
 }
 
