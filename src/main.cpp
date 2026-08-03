@@ -130,7 +130,12 @@ int main()
 
         //Bypass the ImGUI windows system and get the background canvas
         ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
-        
+
+       // Get the current font
+        ImFont* current_font = ImGui::GetFont();
+
+        // Set your desired font size (e.g., 50% larger than default)
+        float custom_font_size = ImGui::GetFontSize() * 1.5f;
         
         if (is_windows_visible)
         {
@@ -139,6 +144,8 @@ int main()
                 const auto& point = points[i];
                 const auto& key = keys[i];
                 draw_list->AddText(
+                    current_font,
+                    custom_font_size,
                     ImVec2(point.first, point.second),
                     IM_COL32(255, 0, 0, 255),
                     key.data(), key.data()+2
@@ -295,38 +302,40 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
             }
             default:
             {
-                BYTE keyboardState[256];
-                ::GetKeyboardState(keyboardState);
+                if (is_windows_visible) {
+                    BYTE keyboardState[256];
+                    ::GetKeyboardState(keyboardState);
 
-                keyboardState[VK_SHIFT] = ::GetKeyState(VK_SHIFT) & 0x8000;
-                keyboardState[VK_CAPITAL] = ::GetKeyState(VK_CAPITAL) & 0x8000;
-                keyboardState[VK_CONTROL] = ::GetKeyState(VK_CONTROL) & 0x8000;
-                keyboardState[VK_MENU] = ::GetKeyState(VK_MENU) & 0x8000;
+                    keyboardState[VK_SHIFT] = ::GetKeyState(VK_SHIFT) & 0x8000;
+                    keyboardState[VK_CAPITAL] = ::GetKeyState(VK_CAPITAL) & 0x8000;
+                    keyboardState[VK_CONTROL] = ::GetKeyState(VK_CONTROL) & 0x8000;
+                    keyboardState[VK_MENU] = ::GetKeyState(VK_MENU) & 0x8000;
 
-                HKL keyboardLayout = ::GetKeyboardLayout(GetWindowThreadProcessId(GetForegroundWindow(), NULL));
+                    HKL keyboardLayout = ::GetKeyboardLayout(GetWindowThreadProcessId(GetForegroundWindow(), NULL));
 
-                WORD asciiChar = 0; 
+                    WORD asciiChar = 0;
 
-                int result = ToAsciiEx(
-                    pKey->vkCode, 
-                    pKey->scanCode, 
-                    keyboardState, 
-                    &asciiChar, 
-                    0, 
-                    keyboardLayout
-                );
-                if (result > 0)
-                {
-                    auto result = engine.match_target(asciiChar);
-                    if (result)
+                    int result = ToAsciiEx(
+                        pKey->vkCode,
+                        pKey->scanCode,
+                        keyboardState,
+                        &asciiChar,
+                        0,
+                        keyboardLayout
+                    );
+                    if (result > 0)
                     {
-                        auto value = result.value();
-                        is_left_shift_down = false;
-                        is_right_shift_down = false;
-                        showHideWindow(false);
+                        auto result = engine.match_target(asciiChar);
+                        if (result)
+                        {
+                            auto value = result.value();
+                            is_left_shift_down = false;
+                            is_right_shift_down = false;
+                            showHideWindow(false);
 
-                        ClickAtPixel(value.first, value.second);
-                        return 1;
+                            ClickAtPixel(value.first, value.second);
+                            return 1;
+                        }
                     }
                 }
             }
@@ -499,15 +508,16 @@ std::vector<std::pair<float, float>> DetectUIWithCCA(const cv::Mat& image)
         cv::THRESH_BINARY_INV, 3, 1);
     SaveImage(gray, "c:\\temp\\1.bmp");
 
-    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
+    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(4, 3));
     cv::morphologyEx(binary, binary, cv::MORPH_CLOSE, kernel);
+
     SaveImage(binary, "c:\\temp\\2.bmp");
 
     cv::Mat labels, stats, centroids;
     int numLabels = cv::connectedComponentsWithStats(binary, labels, stats, centroids, 8, CV_32S);
 
     // Define how close (in pixels) two elements can be before we consider them the "same" object
-    const float MIN_DISTANCE = 25.0f; 
+    const float MIN_DISTANCE = 15.0f; 
 
     for (int i = 1; i < numLabels; i++)
     {
@@ -519,9 +529,8 @@ std::vector<std::pair<float, float>> DetectUIWithCCA(const cv::Mat& image)
 
         double aspectRatio = (double)width / height;
         bool isNotTooThin = (aspectRatio > 0.5 && aspectRatio < 6.0);
-        bool isRightSize = (area > 100 && area < 50000);
+        bool isRightSize = (area > 100 && area < 10000);
 
-        //if (isRightSize && isNotTooThin) 
         if (isRightSize) 
         {
             float centerX = centroids.at<double>(i, 0);
