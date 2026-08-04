@@ -334,15 +334,15 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
                             showHideWindow(false);
 
                             ClickAtPixel(value.first, value.second);
-                            return 1;
                         }
                     }
+                    return 1;
                 }
             }
             }
         }
     }
-   
+
     if (is_left_shift_down && is_right_shift_down && !is_windows_visible)
     {
         HBITMAP screenshot = TakeScreenshot();
