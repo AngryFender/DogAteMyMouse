@@ -276,6 +276,26 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
     if (nCode == HC_ACTION)
     {
+        if (wParam == WM_KEYUP || wParam == WM_SYSKEYUP)
+        {
+            KBDLLHOOKSTRUCT* pKey = (KBDLLHOOKSTRUCT*)lParam;
+            switch (pKey->vkCode)
+            {
+            case VK_LSHIFT:
+            {
+                is_left_shift_down = false;
+                break;
+            }
+            case VK_RSHIFT:
+            {
+                is_right_shift_down = false;
+                break;
+            }
+            default:break;
+            }
+        }
+
+
         if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN)
         {
             KBDLLHOOKSTRUCT* pKey = (KBDLLHOOKSTRUCT*)lParam;
