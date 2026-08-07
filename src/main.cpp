@@ -354,6 +354,8 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
                             showHideWindow(false);
 
                             ClickAtPixel(value.first, value.second);
+                            points.clear();
+
                         }
                     }
                     return 1;
