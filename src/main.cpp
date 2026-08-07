@@ -112,6 +112,22 @@ int main()
     {
         //check message queue & dispatch any new messages 
         MSG msg;
+
+        if (!is_windows_visible) 
+        {
+            //GetMessage blocks and uses 0% cpu until an event (keypress) happens
+            //We can skip the DirectX loop here
+            if (::GetMessage(&msg, nullptr, 0, 0))
+            {
+                ::TranslateMessage(&msg);
+                ::DispatchMessage(&msg);
+
+                if (msg.message == WM_QUIT)
+                    shutdown = true;
+            }
+            continue;
+        }
+
         while (::PeekMessage(&msg, nullptr, 0U, 0U, PM_REMOVE))
         {
             ::TranslateMessage(&msg);
@@ -372,7 +388,13 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
         points = DetectUIWithCCA(HBITMAPToMat(screenshot));
         keys = engine.get_targets(points, screen);
         assert(screenshot && "Screenshot failure");
+
+        DeleteObject(screenshot);
         showHideWindow(true);
+
+        // GetMessage will see it, wake up, and move down to the DirectX render loop.
+        ::PostMessage(hWnd, WM_NULL, 0, 0);
+
     }
 
     //TODO add logic for external keyboard presses 
