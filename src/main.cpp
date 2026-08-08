@@ -149,9 +149,11 @@ int main()
 
        // Get the current font
         ImFont* current_font = ImGui::GetFont();
-
-        // Set your desired font size (e.g., 50% larger than default)
-        float custom_font_size = ImGui::GetFontSize() * 1.5f;
+        float front_font_size = ImGui::GetFontSize() * 1.25f;
+        float back_font_size = ImGui::GetFontSize() * 1.30f;
+        float offset = 1.0f;
+        auto shadow_color = IM_COL32(30, 30, 30, 255);
+        auto front_color = IM_COL32(255, 0, 255, 255);
         
         if (is_windows_visible)
         {
@@ -159,11 +161,44 @@ int main()
             {
                 const auto& point = points[i];
                 const auto& key = keys[i];
+
                 draw_list->AddText(
                     current_font,
-                    custom_font_size,
+                    back_font_size,
+                    ImVec2(point.first-offset, point.second),
+                    shadow_color,
+                    key.data(), key.data()+2
+                    );
+
+                draw_list->AddText(
+                    current_font,
+                    back_font_size,
+                    ImVec2(point.first+offset, point.second),
+                    shadow_color,
+                    key.data(), key.data()+2
+                    );
+
+                draw_list->AddText(
+                    current_font,
+                    back_font_size,
+                    ImVec2(point.first, point.second+offset),
+                    shadow_color,
+                    key.data(), key.data()+2
+                    );
+
+                draw_list->AddText(
+                    current_font,
+                    back_font_size,
+                    ImVec2(point.first, point.second-offset),
+                    shadow_color,
+                    key.data(), key.data()+2
+                    );
+
+                draw_list->AddText(
+                    current_font,
+                    front_font_size,
                     ImVec2(point.first, point.second),
-                    IM_COL32(255, 0, 0, 255),
+                    front_color,
                     key.data(), key.data()+2
                     );
             }
