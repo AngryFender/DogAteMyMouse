@@ -39,6 +39,7 @@ LRESULT WINAPI WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 inline bool is_left_shift_down = false;
 inline bool is_right_shift_down = false;
 inline bool is_windows_visible = false;
+bool debugMode = false;
 
 inline std::vector<std::pair<float, float>> points;
 std::vector<Key> keys;
@@ -51,8 +52,17 @@ void showHideWindow(bool show);
 void SetupKeyboardHooks();
 void CleanupKeyboardHooks();
 
-int main() 
+int main(int argc, char** argv) 
 {
+    std::vector<std::string_view> args(argv + 1, argv + argc);
+
+    for (const auto& arg : args) {
+        if (arg == "-d" || arg == "--debug")
+        {
+            debugMode = true;
+        }
+    }
+
     points.reserve(TOTAL_COMBINATION);
     keys.reserve(TOTAL_COMBINATION);
     SetupKeyboardHooks();
@@ -585,12 +595,15 @@ std::vector<std::pair<float, float>> DetectUIWithCCA(const cv::Mat& image)
     cv::adaptiveThreshold(gray, binary, 255,
         cv::ADAPTIVE_THRESH_GAUSSIAN_C,
         cv::THRESH_BINARY_INV, 3, 1);
-    SaveImage(gray, "c:\\temp\\1.bmp");
 
-    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(4, 3));
+    if(debugMode)
+        SaveImage(gray, "c:\\temp\\1.bmp");
+
+    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
     cv::morphologyEx(binary, binary, cv::MORPH_CLOSE, kernel);
 
-    SaveImage(binary, "c:\\temp\\2.bmp");
+    if(debugMode)
+        SaveImage(binary, "c:\\temp\\2.bmp");
 
     cv::Mat labels, stats, centroids;
     int numLabels = cv::connectedComponentsWithStats(binary, labels, stats, centroids, 8, CV_32S);
@@ -640,7 +653,8 @@ std::vector<std::pair<float, float>> DetectUIWithCCA(const cv::Mat& image)
         }
     }
 
-    SaveImage(original, "c:\\temp\\3.bmp");
+    if(debugMode)
+        SaveImage(original, "c:\\temp\\3.bmp");
 
     return result;
 }
