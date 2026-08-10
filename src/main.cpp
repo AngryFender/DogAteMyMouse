@@ -659,6 +659,86 @@ std::vector<std::pair<float, float>> DetectUIWithCCA(const cv::Mat& image)
     return result;
 }
 
+std::vector<std::pair<float, float>> DetectUIWithCanny(const cv::Mat& image)
+{
+    std::vector<std::pair<float, float>> result;
+    cv::Mat original = image.clone();
+    cv::Mat gray, edges;
+    
+    cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+
+    // Blur slightly to remove static/noise
+    cv::GaussianBlur(gray, gray, cv::Size(3, 3), 0);
+
+    // Canny Edge Detection
+    cv::Canny(gray, edges, 50, 150);
+
+    if (debugMode) 
+        SaveImage(edges, "c:\\temp\\1_canny_raw.bmp");
+
+    // THE FIX: Dilate instead of Close.
+    // use a 5x3 rectangular kernel (wider than it is tall). 
+    // This smears the edges horizontally, fusing letters into words 
+    // and ensuring buttons have solid, thick outlines for the bounding box.
+    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 3));
+    cv::dilate(edges, edges, kernel);
+
+    if (debugMode) 
+        SaveImage(edges, "c:\\temp\\2_canny_dilated.bmp");
+
+    // Use RETR_LIST instead of RETR_EXTERNAL
+    std::vector<std::vector<cv::Point>> contours;
+    cv::findContours(edges, contours, cv::RETR_LIST, cv::CHAIN_APPROX_SIMPLE);
+
+    // Re-added minimum distance logic!
+    const float MIN_DISTANCE = 15.0f; 
+
+    for (const auto& contour : contours)
+    {
+        // Get the perfectly straight bounding box
+        cv::Rect rect = cv::boundingRect(contour);
+        
+        double aspectRatio = (double)rect.width / rect.height;
+        int area = rect.area();
+
+        // Relax the aspect ratio slightly to allow for long text boxes or thin icons
+        bool isRightSize = (area > 30 && area < 15000);
+        bool isNotTooThin = (aspectRatio > 0.2 && aspectRatio < 10.0);
+        
+        if (isRightSize && isNotTooThin) 
+        {
+            float centerX = rect.x + (rect.width / 2.0f);
+            float centerY = rect.y + (rect.height / 2.0f);
+            
+            bool isTooClose = false;
+
+            // Filter out nested contours (e.g., the inside and outside of a button)
+            for (const auto& savedPoint : result) 
+            {
+                float distance = std::hypot(centerX - savedPoint.first, centerY - savedPoint.second);
+                if (distance < MIN_DISTANCE) 
+                {
+                    isTooClose = true;
+                    break; 
+                }
+            }
+            
+            if (!isTooClose) 
+            {
+                result.emplace_back(centerX, centerY);
+                
+                // Draw a nice green box
+                cv::rectangle(original, rect, cv::Scalar(0, 255, 0, 255), 2);
+            }
+        }
+    }
+    
+    if (debugMode) 
+        SaveImage(original, "c:\\temp\\3_canny_final.bmp");
+
+    return result;
+}
+
 void ClickAtPixel(int x, int y) {
     //move the cursor to the target pixel
     SetCursorPos(x, y);
