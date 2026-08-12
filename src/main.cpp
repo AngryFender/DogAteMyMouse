@@ -15,6 +15,7 @@
 #include <opencv2/geometry/2d.hpp>
 #include <opencv2/objdetect.hpp>
 #include <fstream>
+#include <opencv2/imgcodecs.hpp>
 
 //hide the console window
 #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup" )
@@ -333,6 +334,7 @@ HBITMAP TakeScreenshot();
 cv::Mat HBITMAPToMat(HBITMAP hBitmap);
 std::vector<std::pair<float, float>> Detect(cv::Mat image);
 std::vector<std::pair<float, float>> DetectUIWithCCA(const cv::Mat& image);
+std::vector<std::pair<float, float>> DetectUIWithCanny(const cv::Mat& image);
 HHOOK hKeyboardHook = nullptr;
 LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
@@ -432,6 +434,7 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
         HBITMAP screenshot = TakeScreenshot();
         //points = Detect(HBITMAPToMat(screenshot));
         points = DetectUIWithCCA(HBITMAPToMat(screenshot));
+        //points = DetectUIWithCanny(HBITMAPToMat(screenshot));
         keys = engine.get_targets(points, screen);
         assert(screenshot && "Screenshot failure");
 
@@ -550,7 +553,7 @@ std::vector<std::pair<float, float>> Detect(cv::Mat image)
 
 cv::Mat HBITMAPToMat(HBITMAP hBitmap) 
 {
-    BITMAP bmp;
+    BITMAP bmp{};
     GetObject(hBitmap, sizeof(BITMAP), &bmp);
 
     BITMAPINFOHEADER bi;
