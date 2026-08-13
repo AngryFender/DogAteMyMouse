@@ -10,37 +10,29 @@ class KeyGen final : public IKeyGen
 public:
     ~KeyGen() override = default;
 
-    KeyGen(const PossibleCombo& combination): combos_(ALL_COMBINATION), qcombos_{}
+    KeyGen(const PossibleCombo& combination) :qcombos_{}
     {
-        for (const Key& key : combos_) 
+        for (const Key& key : combination)
         {
             qcombos_.push(&key);
         }
     };
 
-    std::vector<Key> generate(const std::vector<std::pair<float, float>>& points, const ScreenInfo& screen) override 
+    std::vector<Key> generate(const std::vector<std::pair<float, float>>& coordinates, const ScreenInfo& screen) override
     {
-        std::queue<const Key*> temp{qcombos_};
+        std::queue<const Key*> temp{ qcombos_ };
 
         std::vector<Key> keys;
-        keys.reserve(points.size());
+        keys.reserve(coordinates.size());
 
-        int random_index = 0;
-        for (const auto& point : points)
+        for (const auto& point : coordinates)
         {
-            const Key& key = *temp.front();
-            keys.push_back(key);
+            keys.push_back(*(temp.front()));
             temp.pop();
         }
         return keys;
     }
 
-    void refresh()override 
-    {
-        //combos_ = ALL_COMBINATION;
-    };
-
 private:
-    const PossibleCombo& combos_;
     std::queue<const Key*> qcombos_;
 };

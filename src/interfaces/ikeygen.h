@@ -7,7 +7,6 @@ class IKeyGen
 {
 public:
     virtual ~IKeyGen() = default;
-    virtual std::vector<Key> generate(const std::vector<std::pair<float, float>>& points, const ScreenInfo& screen) = 0;
-    virtual void refresh() = 0;
+    virtual std::vector<Key> generate(const std::vector<std::pair<float, float>>& coordinates, const ScreenInfo& screen) = 0;
 };
 
