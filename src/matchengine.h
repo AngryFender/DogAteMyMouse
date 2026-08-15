@@ -20,7 +20,7 @@ public:
     {
     }
 
-    std::optional<std::pair<float, float>> match_target(const char keypress) override
+    std::optional<std::pair<float, float>> match_target_keys(const char keypress) override
     {
         std::optional<std::pair<float, float>> result = std::nullopt;
 
@@ -28,9 +28,6 @@ public:
         
         if (buffer_.size() < BUFFER_SIZE)
             return result;
-
-        if (buffer_.size() > BUFFER_SIZE)
-            buffer_.pop();
 
         uint16_t key = char_into_uint16_t(buffer_.front(), buffer_.back());
         if (map_.contains(key))
@@ -48,16 +45,16 @@ public:
         return result;
     }
 
-    std::vector<Key> get_targets(const std::vector<std::pair<float, float>>& points, const ScreenInfo& info) override
+    std::vector<Key> get_target_keys(const std::vector<std::pair<float, float>>& coordinates, const ScreenInfo& info) override
     {
-        const size_t size = points.size();
+        const size_t size = coordinates.size();
         map_.clear();
         map_.reserve(size);
 
         std::vector<Key> keys;
         keys.reserve(size);
 
-        keys = keygen_->generate(points, info);
+        keys = keygen_->generate(coordinates, info);
 
         if (keys.size() == size)
         {
@@ -65,7 +62,7 @@ public:
             {
                 const Key& data = keys[i];
                 uint16_t key = char_into_uint16_t(data[0], data[1]);
-                map_[key] = points[i];
+                map_[key] = coordinates[i];
             }
         }
         else

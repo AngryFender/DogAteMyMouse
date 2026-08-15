@@ -43,7 +43,7 @@ inline bool is_right_shift_down = false;
 inline bool is_windows_visible = false;
 bool debugMode = false;
 
-inline std::vector<std::pair<float, float>> points;
+inline std::vector<std::pair<float, float>> coordinates;
 std::vector<Key> keys;
 ScreenInfo screen;
 MatchEngine engine(std::make_unique<KeyGen>(ALL_COMBINATION));
@@ -65,7 +65,7 @@ int main(int argc, char** argv)
         }
     }
 
-    points.reserve(TOTAL_COMBINATION);
+    coordinates.reserve(TOTAL_COMBINATION);
     keys.reserve(TOTAL_COMBINATION);
     SetupKeyboardHooks();
     SetProcessDPIAware();
@@ -169,9 +169,9 @@ int main(int argc, char** argv)
         
         if (is_windows_visible)
         {
-            for (int i = 0; i < points.size(); ++i)
+            for (int i = 0; i < coordinates.size(); ++i)
             {
-                const auto& point = points[i];
+                const auto& point = coordinates[i];
                 const auto& key = keys[i];
 
                 draw_list->AddText(
@@ -409,7 +409,7 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
                     );
                     if (result > 0)
                     {
-                        auto result = engine.match_target(asciiChar);
+                        auto result = engine.match_target_keys(asciiChar);
                         if (result)
                         {
                             auto value = result.value();
@@ -418,7 +418,7 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
                             showHideWindow(false);
 
                             ClickAtPixel(value.first, value.second);
-                            points.clear();
+                            coordinates.clear();
 
                         }
                     }
@@ -432,10 +432,10 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
     if (is_left_shift_down && is_right_shift_down && !is_windows_visible)
     {
         HBITMAP screenshot = TakeScreenshot();
-        //points = Detect(HBITMAPToMat(screenshot));
-        points = DetectUIWithCCA(HBITMAPToMat(screenshot));
-        //points = DetectUIWithCanny(HBITMAPToMat(screenshot));
-        keys = engine.get_targets(points, screen);
+        //coordinates = Detect(HBITMAPToMat(screenshot));
+        coordinates = DetectUIWithCCA(HBITMAPToMat(screenshot));
+        //coordinates = DetectUIWithCanny(HBITMAPToMat(screenshot));
+        keys = engine.get_target_keys(coordinates, screen);
         assert(screenshot && "Screenshot failure");
 
         DeleteObject(screenshot);
