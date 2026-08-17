@@ -37,6 +37,7 @@ add_executable (${PROJECT_NAME}
     "src/keygen.h"
     "src/entity.h"
     "src/graphics.h"
+    "src/interfaces/iwindow.h"
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
