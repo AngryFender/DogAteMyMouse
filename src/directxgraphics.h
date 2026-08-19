@@ -1,19 +1,32 @@
 #pragma once
+#include "interfaces/igraphics.h"
 #include "imgui.h"
 #include "imgui_impl_dx11.h"
 #include "imgui_impl_win32.h"
 #include <dxgi.h>
 #include <d3d11.h>
+#include <vector>
+#include "entity.h"
 
-class Graphics {
+class DirectXGraphics: public IGraphics {
 
 public:
-    Graphics() {}
-    ~Graphics() {
+    DirectXGraphics() {}
+    ~DirectXGraphics() {
         ImGui_ImplDX11_Shutdown();
         ImGui_ImplWin32_Shutdown();
         ImGui::DestroyContext();
         CleanupDeviceD3D();
+    }
+    
+
+    // main loop where drawing happens
+    bool start() {
+
+    }
+
+    void stop() {
+
     }
 
 private:

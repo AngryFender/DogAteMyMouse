@@ -36,7 +36,7 @@ add_executable (${PROJECT_NAME}
     "src/interfaces/ikeygen.h"
     "src/keygen.h"
     "src/entity.h"
-    "src/graphics.h"
+    "src/directxgraphics.h"
     "src/interfaces/iwindow.h"
     "src/interfaces/igraphics.h"
 )
