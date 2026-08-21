@@ -21,11 +21,13 @@ public:
     
 
     // main loop where drawing happens
-    bool start() {
+    void start(const std::vector<std::pair<float, float>>& coordinates, const std::vector<Key>& keys) override{
+        if (!shutdown) {
 
+        }
     }
 
-    void stop() {
+    void stop() override{
 
     }
 
@@ -42,6 +44,9 @@ IDXGISwapChain* g_pSwapChain = nullptr;
 
 //canvas; memory address on the gpu where the final image is painted 
 ID3D11RenderTargetView* g_mainRenderTargetView = nullptr;
+
+//end the render loop
+bool shutdown = false;
 
 bool CreateDeviceD3D(HWND hWnd)
 {
