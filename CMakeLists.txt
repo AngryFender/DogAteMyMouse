@@ -39,7 +39,8 @@ add_executable (${PROJECT_NAME}
     "src/directxgraphics.h"
     "src/interfaces/iwindow.h"
     "src/interfaces/igraphics.h"
-)
+    "src/manager.h"
+ )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
   ${IMGUI_DIR}
