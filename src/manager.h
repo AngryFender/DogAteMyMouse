@@ -8,11 +8,10 @@ template <
 class Manager {
 
 public:
-    Manager( Renderer renderer, ScreenCapturer capturer, MouseClicker clicker):
-        renderer_(std::move(renderer),
-        screen_capturer_(std::move(capturer), 
-        mouse_clicker_(std::move(clicker))){
-
+    Manager(Renderer&& renderer, ScreenCapturer&& capturer, MouseClicker&& clicker)
+        : renderer_(std::move(renderer),
+          screen_capturer_(std::move(capturer),
+          mouse_clicker_(std::move(clicker)) {
     }
 
     ~Manager() {
