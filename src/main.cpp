@@ -381,6 +381,7 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
                     is_left_shift_down = false;
                     is_right_shift_down = false;
                     showHideWindow(false);
+                    return -1;
                 }
                 break;
             }
