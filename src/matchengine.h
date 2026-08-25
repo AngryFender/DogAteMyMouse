@@ -73,6 +73,13 @@ public:
         return keys;
     }
 
+    void clear()
+    {
+        while (!buffer_.empty()) {
+            buffer_.pop();
+        }
+    }
+
 private:
     std::queue<char> buffer_;
     std::unordered_map<uint16_t, std::pair<float, float>> map_;
