@@ -21,6 +21,13 @@ public:
         //init
         coordinates_.reserve(TOTAL_COMBINATION);
         keys_.reserve(TOTAL_COMBINATION);
+
+        renderer_.init();
+        capturer_.init();
+        keyboard_listener_.init();
+
+        //TODO main loop
+
     }
 
     void start() {
@@ -38,6 +45,9 @@ public:
 
     ~Manager() {
         shutdown = false;
+        renderer_.clearup();
+        capturer_.clearup();
+        keyboard_listener.clearup();
     }
 
 private:
