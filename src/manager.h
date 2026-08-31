@@ -8,7 +8,7 @@ template <
     typename KeyboardListener,
     typename ScreenCapturer,
     typename MouseClicker,
-    typename MatchEngine,
+    typename MatchEngine
 >
 class Manager {
 
@@ -37,6 +37,17 @@ public:
         while (renderer.shutdown() || shutdown) {
             //TODO logic inside the main loop
             
+            if (!renderer.is_window_visible()) {
+                keyboard_listener_.consume_message();
+                continue;
+            }
+
+            //logic when window is visible
+            keyboard_listener_.handle_message();
+
+            //render frames
+            //renderer_.render_frame();
+
 
 
         }
@@ -60,4 +71,4 @@ private:
     MouseClicker mouse_clicker_;
     MatchEngine match_engine_;
     bool shutdown;
-};
+;
