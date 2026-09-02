@@ -4,6 +4,7 @@
 #include <vector>
 
 template <
+    typename Config,
     typename Renderer,
     typename KeyboardListener,
     typename ScreenCapturer,
@@ -13,18 +14,22 @@ template <
 class Manager {
 
 public:
-    Manager(Renderer&& renderer,
+    Manager(
+        Config&& config,
+        Renderer&& renderer,
         KeyboardListener&& listener,
         ScreenCapturer&& capturer,
         MouseClicker&& clicker,
         MatchEngine&& match_engine,
         )
-        : renderer_(std::move(renderer),
+        : 
+            config_(std::move(config)),
+            renderer_(std::move(renderer),
             keyboard_listener_(std::move(listener)),
             screen_capturer_(std::move(capturer),
-                mouse_clicker_(std::move(clicker)),
-                match_engine_(std::move(match_engine)),
-                shutdown{ false }
+            mouse_clicker_(std::move(clicker)),
+            match_engine_(std::move(match_engine)),
+            shutdown{ false }
     {
         //init
         renderer_.init();
@@ -34,7 +39,12 @@ public:
         coordinates_.reserve(TOTAL_COMBINATION);
         keys_.reserve(TOTAL_COMBINATION);
         
-        //keyboard_listener_.set_callback()
+        keyboard_listener_.set_overlay_callback([](bool is_window_visible) {
+            is_window_visible_ = is_window_visible;
+            });
+        keyboard_listener_.set_key_match_callback([]() {
+
+            });
 
     }
 
@@ -42,7 +52,7 @@ public:
         while (renderer.shutdown() || shutdown) {
             //TODO logic inside the main loop
 
-            if (!renderer.is_window_visible()) {
+            if (!is_window_visible_) {
                 keyboard_listener_.consume_message();
                 continue;
             }
@@ -68,6 +78,7 @@ public:
     }
 
 private:
+    Config config_;
     Renderer renderer_;
     KeyboardListener keyboard_listener_;
     ScreenCapturer screen_capturer_;
@@ -78,5 +89,6 @@ private:
     bool shutdown;
     std::vector<std::pair<float, float>> coordinates_;
     std::vector<Key> keys_;
+    bool is_window_visible_;
     ScreenInfo screen;
 };
