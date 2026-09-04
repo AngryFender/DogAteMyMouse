@@ -39,7 +39,7 @@ public:
         coordinates_.reserve(TOTAL_COMBINATION);
         keys_.reserve(TOTAL_COMBINATION);
         
-        keyboard_listener_.set_overlay_callback([](bool is_window_visible) {
+        keyboard_listener_.set_overlay_callback(const std::vector<char>& shortcut, [&is_window_visible_](bool is_window_visible) {
             is_window_visible_ = is_window_visible;
             });
         keyboard_listener_.set_key_match_callback([]() {
