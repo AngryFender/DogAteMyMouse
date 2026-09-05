@@ -42,9 +42,17 @@ public:
         keyboard_listener_.set_overlay_callback(const std::vector<char>& shortcut, [&is_window_visible_](bool is_window_visible) {
             is_window_visible_ = is_window_visible;
             });
-        keyboard_listener_.set_key_match_callback([]() {
+        keyboard_listener_.set_keypress_callback([&match_engine_](const char key) {
+            auto result = match_engine_.match_target_keys(key);
+            if (result)
+            {
+                auto pixels = result.value();
+                //hide window through renderer;
+                //emulate mouse press
+                //clear all states
 
-            });
+            }
+         });
 
     }
 
