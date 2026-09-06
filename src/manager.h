@@ -20,8 +20,7 @@ public:
         KeyboardListener&& listener,
         ScreenCapturer&& capturer,
         MouseClicker&& clicker,
-        MatchEngine&& match_engine,
-        )
+        MatchEngine&& match_engine )
         : 
             config_(std::move(config)),
             renderer_(std::move(renderer),
@@ -39,9 +38,20 @@ public:
         coordinates_.reserve(TOTAL_COMBINATION);
         keys_.reserve(TOTAL_COMBINATION);
         
-        keyboard_listener_.set_overlay_callback(const std::vector<char>& shortcut, [&is_window_visible_](bool is_window_visible) {
+        keyboard_listener_.set_overlay_callback(const std::vector<char>& shortcut, [&is_window_visible_, &screen_capturer_](bool is_window_visible) {
+
+            //take screenshot
+            cv::Mat screenshot = screen_capturer_.capture();
+
+            //run cv algorithm on the screenshot
+
+
+            //generate random keys and coordinates
+            //match_engine.get_target_keys()
+
             is_window_visible_ = is_window_visible;
             });
+
         keyboard_listener_.set_keypress_callback([&match_engine_](const char key) {
             auto result = match_engine_.match_target_keys(key);
             if (result)
@@ -50,7 +60,6 @@ public:
                 //hide window through renderer;
                 //emulate mouse press
                 //clear all states
-
             }
          });
 
