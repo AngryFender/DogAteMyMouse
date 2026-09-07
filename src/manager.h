@@ -3,6 +3,13 @@
 #include "entity.h"
 #include <vector>
 
+template <typename ObjectDetect, typename ImageType>
+concept MatchStrat = requires(ObjectDetect d, ImageType t) {
+    { d(t) } -> std::same_as<std::pair<std::vector<Key>, std::vector<std::pair<float, float>>>>;
+};
+
+
+
 template <
     typename Config,
     typename Renderer,
@@ -41,7 +48,7 @@ public:
         keyboard_listener_.set_overlay_callback(const std::vector<char>& shortcut, [&is_window_visible_, &screen_capturer_](bool is_window_visible) {
 
             //take screenshot
-            cv::Mat screenshot = screen_capturer_.capture();
+            auto screenshot = screen_capturer_.capture();
 
             //run cv algorithm on the screenshot
 
