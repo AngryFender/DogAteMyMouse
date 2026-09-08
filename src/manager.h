@@ -8,15 +8,14 @@ concept MatchStrat = requires(ObjectDetect d, ImageType t) {
     { d(t) } -> std::same_as<std::pair<std::vector<Key>, std::vector<std::pair<float, float>>>>;
 };
 
-
-
 template <
     typename Config,
     typename Renderer,
     typename KeyboardListener,
     typename ScreenCapturer,
     typename MouseClicker,
-    typename MatchEngine
+    typename MatchEngine,
+    typename DetectStrat
 >
 class Manager {
 
@@ -27,7 +26,8 @@ public:
         KeyboardListener&& listener,
         ScreenCapturer&& capturer,
         MouseClicker&& clicker,
-        MatchEngine&& match_engine )
+        MatchEngine&& match_engine,
+        DetectStrat&& detect_strat)
         : 
             config_(std::move(config)),
             renderer_(std::move(renderer),
@@ -35,6 +35,7 @@ public:
             screen_capturer_(std::move(capturer),
             mouse_clicker_(std::move(clicker)),
             match_engine_(std::move(match_engine)),
+            detect_strat_(std::move(detect_strat)),
             shutdown{ false }
     {
         //init
@@ -108,6 +109,7 @@ private:
     ScreenCapturer screen_capturer_;
     MouseClicker mouse_clicker_;
     MatchEngine match_engine_;
+    DetectStrat detect_strat_;
 
     //local data
     bool shutdown;
