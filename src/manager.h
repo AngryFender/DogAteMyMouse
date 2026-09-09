@@ -3,10 +3,15 @@
 #include "entity.h"
 #include <vector>
 
+template <typename C>
+using ImageReturnType = decltype(std::declval<C>().capture());
+
 template <typename ObjectDetect, typename ImageType>
 concept MatchStrat = requires(ObjectDetect d, ImageType t) {
-    { d(t) } -> std::same_as<std::pair<std::vector<Key>, std::vector<std::pair<float, float>>>>;
+    { d(t) } -> std::same_as<std::vector<std::pair<float, float>>>;
 };
+
+
 
 template <
     typename Config,
@@ -52,7 +57,7 @@ public:
             auto screenshot = screen_capturer_.capture();
 
             //run cv algorithm on the screenshot
-
+            std::vector<std::pair<float, float>> coordinates = detect_strat_(screenshot);
 
             //generate random keys and coordinates
             //match_engine.get_target_keys()
