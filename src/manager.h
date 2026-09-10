@@ -20,7 +20,7 @@ template <
     typename ScreenCapturer,
     typename MouseClicker,
     typename MatchEngine,
-    typename DetectStrat
+    MatchStrat<ImageReturnType<ScreenCapturer>> DetectStrat
 >
 class Manager {
 
@@ -60,7 +60,7 @@ public:
             std::vector<std::pair<float, float>> coordinates = detect_strat_(screenshot);
 
             //generate random keys and coordinates
-            //match_engine.get_target_keys()
+            match_engine.get_target_keys(corrdinates);
 
             is_window_visible_ = is_window_visible;
             });
