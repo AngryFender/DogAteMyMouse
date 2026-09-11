@@ -4,7 +4,7 @@
 cmake_minimum_required (VERSION 3.10)
 project(DogAteMyMouse)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Enable Hot Reload for MSVC compilers if supported.
