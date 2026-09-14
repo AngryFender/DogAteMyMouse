@@ -1,7 +1,6 @@
 #include "imgui.h"
 #include "imgui_impl_dx11.h"
 #include "imgui_impl_win32.h"
-#include "./interfaces/ikeygen.h"
 #include "matchengine.h"
 #include "keygen.h"
 #include "entity.h"
@@ -46,7 +45,9 @@ bool debugMode = false;
 inline std::vector<std::pair<float, float>> coordinates;
 std::vector<Key> keys;
 ScreenInfo screen;
-MatchEngine engine(std::make_unique<KeyGen>(ALL_COMBINATION));
+
+KeyGen key_generator(ALL_COMBINATION);
+MatchEngine engine(std::move(key_generator));
 
 HWND hWnd;
 void showHideWindow(bool show);

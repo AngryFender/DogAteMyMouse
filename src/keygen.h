@@ -1,14 +1,14 @@
 #pragma once
 
-#include "./interfaces/ikeygen.h"
+#include "./concepts/keygenerator.h"
 #include "entity.h"
 #include <unordered_set>
 #include <iostream>
 
-class KeyGen final : public IKeyGen
+class KeyGen
 {
 public:
-    ~KeyGen() override = default;
+    ~KeyGen() = default;
 
     KeyGen(const PossibleCombo& combination) :qcombos_{}
     {
@@ -18,7 +18,7 @@ public:
         }
     };
 
-    std::vector<Key> generate(const std::vector<std::pair<float, float>>& coordinates, const ScreenInfo& screen) override
+    std::vector<Key> generate(const std::vector<std::pair<float, float>>& coordinates, const ScreenInfo& screen) 
     {
         std::queue<const Key*> temp{ qcombos_ };
 
@@ -36,3 +36,5 @@ public:
 private:
     std::queue<const Key*> qcombos_;
 };
+
+static_assert(KeyGenerator<KeyGen>);

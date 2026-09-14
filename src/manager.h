@@ -7,11 +7,6 @@
 template <typename C>
 using ImageReturnType = decltype(std::declval<C>().capture());
 
-template <typename T>
-concept KeyGenerator = requires(T obj, const std::vector<std::pair<float, float>>&coordinates, const ScreenInfo & screen) {
-    { obj.generate(coordinates, screen) } -> std::same_as<std::vector<Key>>;
-};
-
 template <typename ObjectDetect, typename ImageType>
 concept MatchStrat = requires(ObjectDetect d, ImageType t) {
     { d(t) } -> std::same_as<std::vector<std::pair<float, float>>>;
@@ -23,7 +18,7 @@ template <
     typename KeyboardListener,
     typename ScreenCapturer,
     typename MouseClicker,
-    KeyGenerator MatchEngine,
+    typename MatchEngine,
     MatchStrat<ImageReturnType<ScreenCapturer>> DetectStrat
 >
 class Manager {

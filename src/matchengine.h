@@ -1,26 +1,28 @@
 #pragma once
 
-#include "./interfaces/imatchengine.h"
+#include "./concepts/keygenerator.h"
 #include <queue>
 #include <unordered_map>
 #include <memory>
 #include <utility>
 #include <iostream>
+#include <optional>
 
 inline uint16_t char_into_uint16_t(char high, char low)
 {
     return static_cast<uint16_t>(high) << 8 | static_cast<uint16_t>(low);
 }
 
-class MatchEngine final : public IMatchEngine 
+template <KeyGenerator KeyGen>
+class MatchEngine
 {
 public:
-    ~MatchEngine() override = default;
-    MatchEngine(std::unique_ptr<IKeyGen>&& keygen) :keygen_(std::move(keygen))
+    ~MatchEngine() = default;
+    MatchEngine(KeyGen&& keygen) :keygen_(std::move(keygen))
     {
     }
 
-    std::optional<std::pair<float, float>> match_target_keys(const char keypress) override
+    std::optional<std::pair<float, float>> match_target_keys(const char keypress)
     {
         std::optional<std::pair<float, float>> result = std::nullopt;
 
@@ -45,7 +47,7 @@ public:
         return result;
     }
 
-    std::vector<Key> get_target_keys(const std::vector<std::pair<float, float>>& coordinates, const ScreenInfo& info) override
+    std::vector<Key> get_target_keys(const std::vector<std::pair<float, float>>& coordinates, const ScreenInfo& info)
     {
         const size_t size = coordinates.size();
         map_.clear();
@@ -54,7 +56,7 @@ public:
         std::vector<Key> keys;
         keys.reserve(size);
 
-        keys = keygen_->generate(coordinates, info);
+        keys = keygen_.generate(coordinates, info);
 
         if (keys.size() == size)
         {
@@ -83,6 +85,6 @@ public:
 private:
     std::queue<char> buffer_;
     std::unordered_map<uint16_t, std::pair<float, float>> map_;
-    std::unique_ptr<IKeyGen> keygen_;
+    KeyGen keygen_;
 
 };

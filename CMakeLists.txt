@@ -31,16 +31,16 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 add_executable (${PROJECT_NAME} 
     "src/main.cpp"
     ${IMGUI_SOURCES}    
-    "src/interfaces/imatchengine.h"  
+      
     "src/matchengine.h"
-    "src/interfaces/ikeygen.h"
+    
     "src/keygen.h"
     "src/entity.h"
     "src/directxgraphics.h"
     "src/interfaces/iwindow.h"
     "src/interfaces/igraphics.h"
     "src/manager.h"
- )
+  "src/concepts/keygenerator.h")
 
 target_include_directories(${PROJECT_NAME} PUBLIC
   ${IMGUI_DIR}
