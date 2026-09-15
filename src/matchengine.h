@@ -1,5 +1,6 @@
 #pragma once
 
+#include "./concepts/targetkeysmanager.h"
 #include "./concepts/keygenerator.h"
 #include <queue>
 #include <unordered_map>
@@ -86,5 +87,5 @@ private:
     std::queue<char> buffer_;
     std::unordered_map<uint16_t, std::pair<float, float>> map_;
     KeyGen keygen_;
-
 };
+

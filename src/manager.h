@@ -3,6 +3,8 @@
 #include "entity.h"
 #include <vector>
 #include <concepts>
+#include "./concepts/targetkeysmanager.h"
+
 
 template <typename C>
 using ImageReturnType = decltype(std::declval<C>().capture());
@@ -18,7 +20,7 @@ template <
     typename KeyboardListener,
     typename ScreenCapturer,
     typename MouseClicker,
-    typename MatchEngine,
+    TargetKeysManager MatchEngine,
     MatchStrat<ImageReturnType<ScreenCapturer>> DetectStrat
 >
 class Manager {
