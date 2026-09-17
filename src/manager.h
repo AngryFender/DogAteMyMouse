@@ -4,6 +4,7 @@
 #include <vector>
 #include <concepts>
 #include "./concepts/targetkeysmanager.h"
+#include "./concepts/mousemanager.h"
 
 
 template <typename C>
@@ -19,7 +20,7 @@ template <
     typename Renderer,
     typename KeyboardListener,
     typename ScreenCapturer,
-    typename MouseClicker,
+    MouseManager MouseClicker,
     TargetKeysManager MatchEngine,
     MatchStrat<ImageReturnType<ScreenCapturer>> DetectStrat
 >

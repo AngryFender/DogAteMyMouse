@@ -40,6 +40,7 @@ add_executable (${PROJECT_NAME}
     "src/manager.h"
     "src/concepts/keygenerator.h"
     "src/concepts/targetkeysmanager.h"
+	"src/concepts/mousemanager.h"
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
