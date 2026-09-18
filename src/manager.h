@@ -73,7 +73,10 @@ public:
             {
                 auto pixels = result.value();
                 //hide window through renderer;
+                
                 //emulate mouse press
+                //mouse_clicker_.click()
+
                 //clear all states
             }
          });
