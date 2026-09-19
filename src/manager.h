@@ -3,6 +3,7 @@
 #include "entity.h"
 #include <vector>
 #include <concepts>
+#include "./concepts/screenrenderer.h"
 #include "./concepts/targetkeysmanager.h"
 #include "./concepts/mousemanager.h"
 
@@ -17,7 +18,7 @@ concept MatchStrat = requires(ObjectDetect d, ImageType t) {
 
 template <
     typename Config,
-    typename Renderer,
+    ScreenRenderer Renderer,
     typename KeyboardListener,
     typename ScreenCapturer,
     MouseManager MouseClicker,
