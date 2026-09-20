@@ -8,7 +8,7 @@
 #include <vector>
 #include "entity.h"
 
-class DirectXGraphics: public IGraphics {
+class DirectXGraphics{
 
 public:
     DirectXGraphics() {}
@@ -21,13 +21,13 @@ public:
     
 
     // main loop where drawing happens
-    void start(const std::vector<std::pair<float, float>>& coordinates, const std::vector<Key>& keys) override{
+    void start(const std::vector<std::pair<float, float>>& coordinates, const std::vector<Key>& keys) {
         if (!shutdown) {
 
         }
     }
 
-    void stop() override{
+    void stop(){
 
     }
 
