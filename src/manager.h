@@ -85,20 +85,19 @@ public:
     }
 
     void start() {
-        while (renderer.shutdown() || shutdown) {
+        while (renderer.is_shutdown() || shutdown) {
             //TODO logic inside the main loop
 
             if (!is_window_visible_) {
-                keyboard_listener_.consume_message();
+                keyboard_listener_.consume_message(); //get message, translate message & dispatch message
                 continue;
             }
 
             //logic when window is visible
-            keyboard_listener_.handle_message();
+            keyboard_listener_.handle_message(); //peek message, translate message & dispatch message
 
             //render frames
-            renderer_.render_frame(coordinates_, keys);
-
+            renderer_.render_frame(coordinates_, keys, is_window_visible);
         }
     }
 
