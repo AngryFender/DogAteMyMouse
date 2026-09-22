@@ -97,7 +97,7 @@ public:
             keyboard_listener_.handle_message(); //peek message, translate message & dispatch message
 
             //render frames
-            renderer_.render_frame(coordinates_, keys, is_window_visible);
+            renderer_.render_frame(coordinates_, keys);
         }
     }
 
