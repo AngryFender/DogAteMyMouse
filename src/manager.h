@@ -4,6 +4,7 @@
 #include <vector>
 #include <concepts>
 #include "./concepts/screenrenderer.h"
+#include "./concepts/keyboardmanager.h"
 #include "./concepts/targetkeysmanager.h"
 #include "./concepts/mousemanager.h"
 
@@ -19,7 +20,7 @@ concept MatchStrat = requires(ObjectDetect d, ImageType t) {
 template <
     typename Config,
     ScreenRenderer Renderer,
-    typename KeyboardListener,
+    KeyboardManager KeyboardListener,
     typename ScreenCapturer,
     MouseManager MouseClicker,
     TargetKeysManager MatchEngine,
