@@ -90,7 +90,7 @@ public:
             //TODO logic inside the main loop
 
             if (!is_window_visible_) {
-                keyboard_listener_.consume_message(); //get message, translate message & dispatch message
+                keyboard_listener_.wait_message(); //get message, translate message & dispatch message
                 continue;
             }
 
