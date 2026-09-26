@@ -42,6 +42,7 @@ add_executable (${PROJECT_NAME}
     "src/concepts/mousemanager.h"
     "src/concepts/screenrenderer.h"
     "src/concepts/keyboardmanager.h"
+    "src/winkeyboard.h"
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
