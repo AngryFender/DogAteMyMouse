@@ -1,12 +1,20 @@
 #include <Windows.h>
-#include<vector>
-#include<functional>
+#include <vector>
+#include <functional>
+#include "windowcontext.h"
 
 class WinKeyboard {
 public:
+    void init() {
+        //register win message handler here using context.hWnd
+        HINSTANCE hInstance = ::GetModuleHandle(NULL);
+        hook_ = ::SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInstance, 0);
+    }
+
     void set_overlay_callback(const std::vector<char>& shortcut, std::function<void(bool)> callback) {
         overlay_callback_ = callback;
     }
+
     void set_keypress_callback(std::function<void(const char)>callback) {
         keypress_callback_ = callback;
     }
@@ -34,6 +42,13 @@ public:
     }
 
 private:
+    HHOOK hook_ = nullptr;
     std::function<void(bool)> overlay_callback_;
     std::function<void(const char)> keypress_callback_;
+
+    static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
+    {
+        //TODO add key detection logic here
+        return ::CallNextHookEx(nullptr, nCode, wParam, lParam);
+    }
 };
