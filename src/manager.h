@@ -1,5 +1,6 @@
 #pragma once
 #include "entity.h"
+#include "windowcontext.h"
 #include <vector>
 #include <concepts>
 #include "./concepts/screenrenderer.h"
@@ -29,6 +30,7 @@ class Manager {
 
 public:
     Manager(
+        WindowContext&& wincontext,
         Config&& config,
         Renderer&& renderer,
         KeyboardListener&& listener,
@@ -37,6 +39,7 @@ public:
         MatchEngine&& match_engine,
         DetectStrat&& detect_strat)
         : 
+            wincontext_(std::move(wincontext)),
             config_(std::move(config)),
             renderer_(std::move(renderer),
             keyboard_listener_(std::move(listener)),
@@ -113,6 +116,7 @@ public:
     }
 
 private:
+    WindowContext wincontext_;
     Config config_;
     Renderer renderer_;
     KeyboardListener keyboard_listener_;

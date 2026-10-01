@@ -1,11 +1,11 @@
 #pragma once
 
-#if defined(_WIN32)
-
 #include <Windows.h>
 #include "entity.h" 
 
 struct WindowContext {
+
+#if defined(_WIN32)
     HWND hWnd;
     ScreenInfo screen;
     WindowContext() {
@@ -22,16 +22,15 @@ struct WindowContext {
         ::RegisterClassExW(&wc);
         hWnd = ::CreateWindowExW(WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW, wc.lpszClassName, L"Dog ate my mouse", WS_POPUP, 0, 0, screen.width, screen.height, nullptr, nullptr, wc.hInstance, nullptr);
     }
-};
 
 #else
 
 
-struct WindowContext {
+
+#endif
 
 };
 
 
-#endif //
 
 
