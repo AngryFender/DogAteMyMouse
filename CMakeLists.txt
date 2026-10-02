@@ -42,7 +42,7 @@ add_executable (${PROJECT_NAME}
     "src/concepts/screenrenderer.h"
     "src/concepts/keyboardmanager.h"
     "src/winkeyboard.h"
-    "src/windowcontext.h"
+    "src/overlaycontext.h"
     "src/winmouse.h"
 )
 

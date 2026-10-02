@@ -1,5 +1,4 @@
 #include <Windows.h>
-#include "windowcontext.h"
 
 class WinMouse {
 

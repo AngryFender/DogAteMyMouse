@@ -1,6 +1,6 @@
 #pragma once
 #include "entity.h"
-#include "windowcontext.h"
+#include "overlaycontext.h"
 #include <vector>
 #include <concepts>
 #include "./concepts/screenrenderer.h"
@@ -30,7 +30,7 @@ class Manager {
 
 public:
     Manager(
-        WindowContext&& wincontext,
+        OverlayContext&& context,
         Config&& config,
         Renderer&& renderer,
         KeyboardListener&& listener,
@@ -39,7 +39,6 @@ public:
         MatchEngine&& match_engine,
         DetectStrat&& detect_strat)
         : 
-            wincontext_(std::move(wincontext)),
             config_(std::move(config)),
             renderer_(std::move(renderer),
             keyboard_listener_(std::move(listener)),
@@ -48,6 +47,7 @@ public:
             match_engine_(std::move(match_engine)),
             detect_strat_(std::move(detect_strat)),
             shutdown{ false }
+        context_(std::move(context)),
     {
         //init
         renderer_.init();
@@ -91,7 +91,7 @@ public:
         while (renderer.is_shutdown() || shutdown) {
             //TODO logic inside the main loop
 
-            if (!is_window_visible_) {
+            if (!is_overlay_visible_) {
                 keyboard_listener_.wait_message(); //get message, translate message & dispatch message
                 continue;
             }
@@ -116,7 +116,7 @@ public:
     }
 
 private:
-    WindowContext wincontext_;
+    OverlayContext context_;
     Config config_;
     Renderer renderer_;
     KeyboardListener keyboard_listener_;
@@ -129,6 +129,6 @@ private:
     bool shutdown;
     std::vector<std::pair<float, float>> coordinates_;
     std::vector<Key> keys_;
-    bool is_window_visible_;
     ScreenInfo screen;
+    bool is_overlay_visible_;
 };
