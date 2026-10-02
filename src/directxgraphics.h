@@ -6,26 +6,84 @@
 #include <d3d11.h>
 #include <vector>
 #include "entity.h"
+#include <Windows.h>
 
 class DirectXGraphics{
 
 public:
-    DirectXGraphics(): clear_color_(0.0f, 0.0f, 0.0f, 0.00f) 
+    DirectXGraphics(const OverlayContext& context) : context_(context), clear_color_(0.0f, 0.0f, 0.0f, 0.00f)
     {
-    
     }
+
+    DirectXGraphics(const DirectXGraphics&) = delete;
+    DirectXGraphics& operator=(const DirectXGraphics&) = delete;
+
+    DirectXGraphics(DirectXGraphics &&other) noexcept: clear_color_(other.clear_color_)
+    {
+        g_pd3dDevice = std::exchange(other.g_pd3dDevice, nullptr);
+        g_pd3dDeviceContext = std::exchange(other.g_pd3dDeviceContext, nullptr);
+        g_pSwapChain = std::exchange(other.g_pSwapChain, nullptr);
+        g_mainRenderTargetView = std::exchange(other.g_mainRenderTargetView, nullptr);
+    }
+
+    DirectXGraphics& operator=(DirectXGraphics&& other) noexcept{
+        if (this != &other) {
+
+            if (g_pd3dDevice != nullptr) {
+                ::ImGui_ImplDX11_Shutdown();
+                ::ImGui_ImplWin32_Shutdown();
+                ImGui::DestroyContext();
+            }
+
+            CleanupDeviceD3D();
+            clear_color_ = other.clear_color_;
+            g_pd3dDevice = std::exchange(other.g_pd3dDevice, nullptr);
+            g_pd3dDeviceContext = std::exchange(other.g_pd3dDeviceContext, nullptr);
+            g_pSwapChain = std::exchange(other.g_pSwapChain, nullptr);
+            g_mainRenderTargetView = std::exchange(other.g_mainRenderTargetView, nullptr);
+        }
+        return *this;
+    }
+
     ~DirectXGraphics() {
-        ImGui_ImplDX11_Shutdown();
-        ImGui_ImplWin32_Shutdown();
-        ImGui::DestroyContext();
+        if (g_pd3dDevice) {
+            ::ImGui_ImplDX11_Shutdown();
+            ::ImGui_ImplWin32_Shutdown();
+            ImGui::DestroyContext();
+        }
         CleanupDeviceD3D();
     }
     
     void init() {
-    }
+        ::SetProcessDPIAware();
+        float main_scale = ::ImGui_ImplWin32_GetDpiScaleForMonitor(::MonitorFromPoint(POINT{ 0,0 }, MONITOR_DEFAULTTOPRIMARY));
 
-    bool is_shutdown() const {
-        return shutdown;
+        MARGINS margins = { -1, -1, -1,-1 };
+        ::DwmExtendFrameIntoClientArea(context_.hWnd, &margins);
+        ::SetLayeredWindowAttributes(context_.hWnd, 0, 255, LWA_ALPHA);
+
+        if (!CreateDeviceD3D(context_.hWnd)) {
+            CleanupDeviceD3D();
+            assert(false && "Couldn't create Device D3D");
+        }
+
+        //setup Dear ImGui contexnt
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO(); (void)io;
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+        //setup Dear ImGui style
+        ImGui::StyleColorsLight();
+
+        //setup scaling
+        ImGuiStyle& style = ImGui::GetStyle();
+        style.ScaleAllSizes(main_scale);
+        style.FontScaleDpi = main_scale;
+
+        //setup platform/renderer backends
+        ::ImGui_ImplWin32_Init(context_.hWnd);
+        ::ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
     }
 
     void render_frame(const std::vector<std::pair<float, float>>& coordinates, const std::vector<Key>& keys) {
@@ -109,7 +167,22 @@ public:
         HRESULT hr = g_pSwapChain->Present(1, 0);
     }
 
+    void showOverlay(bool show) const
+    {
+        int mode = show ? SW_SHOWDEFAULT : SW_HIDE;
+        ::ShowWindow(context_.hWnd, mode);
+        ::UpdateWindow(context_.hWnd);
+    }
+
+    void refresh() const {
+        //GetMessage will see it, wake up, and move down to the DirectX render loop.
+        //Places (posts) a message in the message queue associated with the thread that created the specified window and returns without waiting for the thread to process the message.
+        ::PostMessage(context_.hWnd, WM_NULL, 0, 0);
+    }
+
 private:
+    OverlayContext context_;
+
     ImVec4 clear_color_;
 
     //allocate memory and create resources in the gpu
@@ -123,9 +196,6 @@ private:
 
     //canvas; memory address on the gpu where the final image is painted 
     ID3D11RenderTargetView* g_mainRenderTargetView = nullptr;
-
-    //end the render loop
-    bool shutdown = false;
 
     bool CreateDeviceD3D(HWND hWnd)
     {
