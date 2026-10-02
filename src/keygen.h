@@ -1,5 +1,4 @@
 #pragma once
-
 #include "./concepts/keygenerator.h"
 #include "entity.h"
 #include <unordered_set>

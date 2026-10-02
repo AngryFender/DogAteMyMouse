@@ -1,3 +1,4 @@
+#pragma once
 #include <Windows.h>
 
 class WinMouse {
@@ -7,6 +8,7 @@ public:
     WinMouse() = default;
 
     void click(const std::pair<int, int> pixel)const {
+
         //move the cursor to the target pixel
         ::SetCursorPos(pixel.first, pixel.second);
 

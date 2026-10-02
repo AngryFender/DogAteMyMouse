@@ -1,5 +1,4 @@
 #pragma once
-
 #include "./concepts/targetkeysmanager.h"
 #include "./concepts/keygenerator.h"
 #include <queue>
@@ -8,6 +7,8 @@
 #include <utility>
 #include <iostream>
 #include <optional>
+#include "entity.h"
+#include <algorithm>
 
 inline uint16_t char_into_uint16_t(char high, char low)
 {
@@ -48,7 +49,7 @@ public:
         return result;
     }
 
-    std::vector<Key> get_target_keys(const std::vector<std::pair<float, float>>& coordinates, const ScreenInfo& info)
+    std::vector<Key> get_target_keys(const std::vector<std::pair<float, float>> &coordinates, const ScreenInfo &info)
     {
         const size_t size = coordinates.size();
         map_.clear();
