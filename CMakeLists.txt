@@ -45,6 +45,7 @@ add_executable (${PROJECT_NAME}
     "src/overlaycontext.h"
     "src/winmouse.h"
     "src/wincapturer.h" 
+    "src/strategies/cca.h"
     "src/emptyconfig.h"
 )
 
