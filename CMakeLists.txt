@@ -44,6 +44,7 @@ add_executable (${PROJECT_NAME}
     "src/winkeyboard.h"
     "src/overlaycontext.h"
     "src/winmouse.h"
+    "src/wincapturer.h" 
     "src/emptyconfig.h"
 )
 
