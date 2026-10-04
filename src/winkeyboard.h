@@ -20,6 +20,26 @@ public:
         shortcuts_[VK_RSHIFT] = false;
     }
 
+    ~WinKeyboard() {
+        if (hook_) {
+            ::UnhookWindowsHookEx(hook_);
+        }
+    }
+
+    WinKeyboard(WinKeyboard& other) = delete;
+    WinKeyboard& operator=(WinKeyboard& other) = delete;
+
+    WinKeyboard(WinKeyboard&& other) {
+        hook_ = std::exchange(other.hook_, nullptr);
+    }
+
+    WinKeyboard& operator=(WinKeyboard&& other) {
+        if (this != &other) {
+            hook_ = std::exchange(other.hook_, nullptr);
+        }
+        return *this;
+    }
+
     void set_overlay_callback(std::vector<char>&& shortcuts, std::function<void(bool)> callback) {
         if (!shortcuts.empty()) {
             //TODO convert keypress from agnostic format to windows format
