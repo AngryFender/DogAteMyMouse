@@ -7,14 +7,15 @@
 #include "./concepts/keyboardmanager.h"
 #include "./concepts/targetkeysmanager.h"
 #include "./concepts/mousemanager.h"
-
+#include <utility>
+#include <algorithm>
 
 template <typename C>
 using ImageReturnType = decltype(std::declval<C>().capture());
 
 template <typename ObjectDetect, typename ImageType>
 concept MatchStrat = requires(ObjectDetect d, ImageType t) {
-    { d(t) } -> std::same_as<std::vector<std::pair<float, float>>>;
+    { d(std::move(t)) } -> std::same_as<std::vector<std::pair<float, float>>>;
 };
 
 template <
@@ -38,58 +39,89 @@ public:
         MouseClicker&& clicker,
         MatchEngine&& match_engine,
         DetectStrat&& detect_strat)
-        : 
-            config_(std::move(config)),
-            renderer_(std::move(renderer),
-            keyboard_listener_(std::move(listener)),
-            screen_capturer_(std::move(capturer),
-            mouse_clicker_(std::move(clicker)),
-            match_engine_(std::move(match_engine)),
-            detect_strat_(std::move(detect_strat)),
-            shutdown{ false }
+        :
         context_(std::move(context)),
+        config_(std::move(config)),
+        renderer_(std::move(renderer)),
+        keyboard_listener_(std::move(listener)),
+        screen_capturer_(std::move(capturer)),
+        mouse_clicker_(std::move(clicker)),
+        match_engine_(std::move(match_engine)),
+        detect_strat_(std::move(detect_strat)),
+        shutdown{ false },
+        is_overlay_visible_{ false }
     {
         //init
         renderer_.init();
-        capturer_.init();
-        keyboard_listener_.init();
 
         coordinates_.reserve(TOTAL_COMBINATION);
         keys_.reserve(TOTAL_COMBINATION);
         
-        keyboard_listener_.set_overlay_callback(const std::vector<char>& shortcut, [&is_window_visible_, &screen_capturer_](bool is_window_visible) {
-
-            //take screenshot
-            auto screenshot = screen_capturer_.capture();
-
-            //run cv algorithm on the screenshot
-            std::vector<std::pair<float, float>> coordinates = detect_strat_(screenshot);
-
-            //generate random keys and coordinates
-            match_engine.get_target_keys(corrdinates);
-
-            is_window_visible_ = is_window_visible;
-            });
-
-        keyboard_listener_.set_keypress_callback([&match_engine_](const char key) {
-            auto result = match_engine_.match_target_keys(key);
-            if (result)
+        keyboard_listener_.set_overlay_callback(
+            std::vector<char>{},
+            [this](bool show_overlay)
             {
-                auto pixels = result.value();
-                //hide window through renderer;
-                
-                //emulate mouse press
-                //mouse_clicker_.click()
+                if (show_overlay) {
 
-                //clear all states
+                    //take screenshot
+                    auto screenshot = screen_capturer_.capture();
+
+                    //run cv algorithm on the screenshot
+                    coordinates_ = detect_strat_(std::move(screenshot));
+
+                    //generate random keys and coordinates
+                    keys_ = match_engine_.get_target_keys(coordinates_, context_.screen);
+
+                    //refresh is important for the render loop to get the 
+                    renderer_.refresh();
+                }
+                else {
+
+                    //reset 
+                    coordinates_.clear();
+                    keys_.clear();
+                    match_engine_.clear();
+                }
+
+                renderer_.showOverlay(show_overlay);
+                is_overlay_visible_ = show_overlay;
             }
-         });
+        );
+
+        keyboard_listener_.set_keypress_callback(
+            [this](const char key) 
+            {
+                auto result = match_engine_.match_target_keys(key);
+                if (result)
+                {
+                    auto pixel = result.value();
+                    //hide window through renderer;
+
+                    //emulate mouse press
+                    mouse_clicker_.click(pixel);
+
+                    //clear all states
+                    renderer_.showOverlay(false);
+                    is_overlay_visible_ = false;
+
+                    coordinates_.clear();
+                    keys_.clear();
+                    match_engine_.clear();
+                }
+            }
+        );
+
+        keyboard_listener_.set_overlay_state_getter(
+            [this]() {
+                return is_overlay_visible_;
+            }
+        );
 
     }
 
     void start() {
-        while (renderer.is_shutdown() || shutdown) {
-            //TODO logic inside the main loop
+        //control loop
+        while (!shutdown) {
 
             if (!is_overlay_visible_) {
                 keyboard_listener_.wait_message(); //get message, translate message & dispatch message
@@ -100,7 +132,7 @@ public:
             keyboard_listener_.handle_message(); //peek message, translate message & dispatch message
 
             //render frames
-            renderer_.render_frame(coordinates_, keys);
+            renderer_.render_frame(coordinates_, keys_);
         }
     }
 
@@ -109,10 +141,7 @@ public:
     }
 
     ~Manager() {
-        shutdown = false;
-        renderer_.clearup();
-        capturer_.clearup();
-        keyboard_listener.clearup();
+        shutdown = true;
     }
 
 private:
@@ -129,6 +158,5 @@ private:
     bool shutdown;
     std::vector<std::pair<float, float>> coordinates_;
     std::vector<Key> keys_;
-    ScreenInfo screen;
     bool is_overlay_visible_;
 };
