@@ -35,7 +35,40 @@ struct OverlayContext {
     }
 
     ~OverlayContext() {
+        if (hWnd) {
+            ::DestroyWindow(hWnd);
+        }
         ::UnregisterClassW(wc.lpszClassName, wc.hInstance);
+    }
+
+    OverlayContext(const OverlayContext&) = delete;
+    OverlayContext& operator=(const OverlayContext&) = delete;
+
+    OverlayContext(OverlayContext&& other) :
+        hWnd(std::exchange(other.hWnd, nullptr)),
+        screen(std::exchange(other.screen, { 0,0 })),
+        wc(other.wc)
+    {
+        other.wc.lpszClassName = nullptr;
+    }
+
+    OverlayContext& operator=(OverlayContext&& other) {
+        if (this != &other) {
+
+            if (hWnd) {
+                ::DestroyWindow(hWnd);
+            }
+            if (wc.lpszClassName) {
+                ::UnregisterClassW(wc.lpszClassName, wc.hInstance);
+            }
+
+            hWnd = std::exchange(other.hWnd, nullptr);
+            screen = std::exchange(other.screen, { 0, 0 });
+            wc = other.wc;
+
+            other.wc.lpszClassName = nullptr;
+        }
+        return *this;
     }
 
 #else
