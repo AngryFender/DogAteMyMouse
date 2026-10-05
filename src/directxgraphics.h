@@ -9,11 +9,12 @@
 #include "imgui_impl_win32.h"
 #include "entity.h"
 #include "overlaycontext.h"
+#include <utility>
 
 class DirectXGraphics{
 
 public:
-    DirectXGraphics(const OverlayContext& context) : context_(context), clear_color_(0.0f, 0.0f, 0.0f, 0.00f)
+    DirectXGraphics(OverlayContext&& context) : context_(std::move(context)), clear_color_(0.0f, 0.0f, 0.0f, 0.00f)
     {
     }
 
@@ -180,6 +181,10 @@ public:
         //GetMessage will see it, wake up, and move down to the DirectX render loop.
         //Places (posts) a message in the message queue associated with the thread that created the specified window and returns without waiting for the thread to process the message.
         ::PostMessage(context_.hWnd, WM_NULL, 0, 0);
+    }
+
+    const ScreenInfo& screenInfo() const {
+        return context_.screen;
     }
 
 private:
