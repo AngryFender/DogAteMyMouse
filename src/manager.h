@@ -31,7 +31,6 @@ class Manager {
 
 public:
     Manager(
-        OverlayContext&& context,
         Config&& config,
         Renderer&& renderer,
         KeyboardListener&& listener,
@@ -40,7 +39,6 @@ public:
         MatchEngine&& match_engine,
         DetectStrat&& detect_strat)
         :
-        context_(std::move(context)),
         config_(std::move(config)),
         renderer_(std::move(renderer)),
         keyboard_listener_(std::move(listener)),
@@ -70,7 +68,7 @@ public:
                     coordinates_ = detect_strat_(std::move(screenshot));
 
                     //generate random keys and coordinates
-                    keys_ = match_engine_.get_target_keys(coordinates_, context_.screen);
+                    keys_ = match_engine_.get_target_keys(coordinates_, renderer_.screenInfo());
 
                     //refresh is important for the render loop to get the 
                     renderer_.refresh();
@@ -145,7 +143,6 @@ public:
     }
 
 private:
-    OverlayContext context_;
     Config config_;
     Renderer renderer_;
     KeyboardListener keyboard_listener_;

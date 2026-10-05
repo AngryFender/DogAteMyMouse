@@ -28,14 +28,12 @@ int main(int argc, char** argv) {
     static_assert(KeyGenerator<KeyGen>, "Keygen does the satisfy the KeyGenerator concept!");
     static_assert(TargetKeysManager<MatchEngine<KeyGen>>, "MatchEngine<Keygen> does not satisfy the TargetKeysManager concept!");
 
-    OverlayContext context;
     KeyGen keygen(ALL_COMBINATION);
     MatchEngine engine(std::move(keygen));
 
     Manager manager(
-        std::move(context),
         EmptyConfig(),
-        DirectXGraphics(context),
+        DirectXGraphics(OverlayContext()),
         WinKeyboard(),
         WinCapturer(),
         WinMouse(),
