@@ -29,12 +29,14 @@ public:
     WinKeyboard(WinKeyboard& other) = delete;
     WinKeyboard& operator=(WinKeyboard& other) = delete;
 
-    WinKeyboard(WinKeyboard&& other) {
-        hook_ = std::exchange(other.hook_, nullptr);
-    }
+    WinKeyboard(WinKeyboard&& other) noexcept :hook_(std::exchange(other.hook_, nullptr)) {}
 
-    WinKeyboard& operator=(WinKeyboard&& other) {
+    WinKeyboard& operator=(WinKeyboard&& other) noexcept {
         if (this != &other) {
+            if (hook_) {
+                ::UnhookWindowsHookEx(hook_);
+            }
+
             hook_ = std::exchange(other.hook_, nullptr);
         }
         return *this;
