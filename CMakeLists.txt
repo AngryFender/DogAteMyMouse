@@ -47,6 +47,7 @@ add_executable (${PROJECT_NAME}
     "src/wincapturer.h" 
     "src/strategies/cca.h"
     "src/emptyconfig.h"
+    "src/util.h"
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
