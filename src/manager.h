@@ -93,15 +93,15 @@ public:
                 if (result)
                 {
                     auto pixel = result.value();
-                    //hide window through renderer;
 
                     //emulate mouse press
                     mouse_clicker_.click(pixel);
 
-                    //clear all states
+                    //hide window through renderer;
                     renderer_.showOverlay(false);
                     is_overlay_visible_ = false;
 
+                    //clear all states
                     coordinates_.clear();
                     keys_.clear();
                     match_engine_.clear();

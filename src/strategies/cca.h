@@ -8,16 +8,15 @@
 #include <opencv2/geometry/2d.hpp>
 #include <opencv2/objdetect.hpp>
 #include <fstream>
-#include <Windows.h>
 #include <opencv2/core/hal/interface.h>
+#include <algorithm>
+#include <utility>
 #include "../util.h"
 
 class CCA{
 public:
     std::vector<std::pair<float, float>> operator()(auto&& image) {
-        auto result = detect(ImageToMat(image));
-        ::DeleteObject(image);
-        return result;
+        return detect((ImageToMat(std::move(image))));
     }
 
 private:

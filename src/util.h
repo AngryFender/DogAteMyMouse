@@ -7,34 +7,46 @@
 #include <opencv2/geometry/2d.hpp>
 #include <opencv2/objdetect.hpp>
 #include <fstream>
-#include <Windows.h>
 #include <opencv2/core/hal/interface.h>
 
-cv::Mat ImageToMat(const HBITMAP& hBitmap)
-    {
-        BITMAP bmp{};
-        GetObject(hBitmap, sizeof(BITMAP), &bmp);
+#if defined(_WIN32)
+#include <Windows.h>
+#endif
 
-        BITMAPINFOHEADER bi;
-        bi.biSize = sizeof(BITMAPINFOHEADER);
-        bi.biWidth = bmp.bmWidth;
-        bi.biHeight = -bmp.bmHeight;
-        bi.biPlanes = 1;
-        bi.biBitCount = 32;
-        bi.biCompression = BI_RGB;
-        bi.biSizeImage = 0;
-        bi.biXPelsPerMeter = 0;
-        bi.biYPelsPerMeter = 0;
-        bi.biClrUsed = 0;
-        bi.biClrImportant = 0;
+cv::Mat ImageToMat(const auto&& raw)
+{
 
-        cv::Mat mat(bmp.bmHeight, bmp.bmWidth, CV_8UC4);
+#if defined(_WIN32)
 
-        HDC hdc = GetDC(NULL);
+    BITMAP bmp{};
+    GetObject(raw, sizeof(BITMAP), &bmp);
 
-        GetDIBits(hdc, hBitmap, 0, bmp.bmHeight, mat.data, (BITMAPINFO*)&bi, DIB_RGB_COLORS);
+    BITMAPINFOHEADER bi;
+    bi.biSize = sizeof(BITMAPINFOHEADER);
+    bi.biWidth = bmp.bmWidth;
+    bi.biHeight = -bmp.bmHeight;
+    bi.biPlanes = 1;
+    bi.biBitCount = 32;
+    bi.biCompression = BI_RGB;
+    bi.biSizeImage = 0;
+    bi.biXPelsPerMeter = 0;
+    bi.biYPelsPerMeter = 0;
+    bi.biClrUsed = 0;
+    bi.biClrImportant = 0;
 
-        ReleaseDC(NULL, hdc);
+    cv::Mat mat(bmp.bmHeight, bmp.bmWidth, CV_8UC4);
 
-        return mat;
-    }
+    HDC hdc = GetDC(NULL);
+
+    GetDIBits(hdc, raw, 0, bmp.bmHeight, mat.data, (BITMAPINFO*)&bi, DIB_RGB_COLORS);
+
+    ReleaseDC(NULL, hdc);
+    DeleteObject(raw);
+    return mat;
+
+#else
+
+#endif 
+
+    
+}

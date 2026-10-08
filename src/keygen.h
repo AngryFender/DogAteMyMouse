@@ -36,4 +36,3 @@ private:
     std::queue<const Key*> qcombos_;
 };
 
-static_assert(KeyGenerator<KeyGen>);
