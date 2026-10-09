@@ -48,6 +48,7 @@ add_executable (${PROJECT_NAME}
     "src/strategies/cca.h"
     "src/emptyconfig.h"
     "src/util.h"
+    "src/wincomposition.h"
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
