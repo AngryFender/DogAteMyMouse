@@ -48,6 +48,7 @@ add_executable (${PROJECT_NAME}
     "src/strategies/cca.h"
     "src/emptyconfig.h"
     "src/util.h"
+    "src/compositionfactory.h"
     "src/wincomposition.h"
 )
 
