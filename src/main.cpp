@@ -20,10 +20,10 @@ int main(int argc, char** argv) {
 
     Manager manager(
         EmptyConfig(),
-        factory.get_renderer(),
-        factory.get_listener(),
-        factory.get_capturer(),
-        factory.get_clicker(),
+        factory.create_renderer(),
+        factory.create_listener(),
+        factory.create_capturer(),
+        factory.create_clicker(),
         MatchEngine(KeyGen(ALL_COMBINATION)),
         CCA()
     );

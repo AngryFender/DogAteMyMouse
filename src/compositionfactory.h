@@ -17,20 +17,20 @@
 template < typename Factory >
 class CompositionFactory {
 public:
-    auto get_renderer() {
-        return factory_.get_renderer();
+    auto create_renderer() {
+        return factory_.create_renderer();
     }
 
-    auto get_listener() {
-        return factory_.get_listener();
+    auto create_listener() {
+        return factory_.create_listener();
     }
 
-    auto get_clicker() {
-        return factory_.get_clicker();
+    auto create_clicker() {
+        return factory_.create_clicker();
     }
 
-    auto get_capturer() {
-        return factory_.get_capturer();
+    auto create_capturer() {
+        return factory_.create_capturer();
     }
 
 private:

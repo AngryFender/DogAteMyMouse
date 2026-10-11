@@ -33,14 +33,8 @@ private:
             cv::ADAPTIVE_THRESH_GAUSSIAN_C,
             cv::THRESH_BINARY_INV, 3, 1);
 
-        //if (debugMode)
-            //SaveImage(gray, "c:\\temp\\1.bmp");
-
         cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
         cv::morphologyEx(binary, binary, cv::MORPH_CLOSE, kernel);
-
-        //if (debugMode)
-            //SaveImage(binary, "c:\\temp\\2.bmp");
 
         cv::Mat labels, stats, centroids;
         int numLabels = cv::connectedComponentsWithStats(binary, labels, stats, centroids, 8, CV_32S);
@@ -89,9 +83,6 @@ private:
                 }
             }
         }
-
-        //if (debugMode)
-            //SaveImage(original, "c:\\temp\\3.bmp");
 
         return result;
     }

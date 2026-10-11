@@ -13,19 +13,19 @@ class WinComposition {
 
 public:
 
-    DirectXGraphics get_renderer() {
+    DirectXGraphics create_renderer() {
         return DirectXGraphics(OverlayContext());
     }
 
-    WinKeyboard get_listener() {
+    WinKeyboard create_listener() {
         return WinKeyboard();
     }
 
-    WinMouse get_clicker() {
+    WinMouse create_clicker() {
         return WinMouse();
     }
 
-    WinCapturer get_capturer() {
+    WinCapturer create_capturer() {
         return WinCapturer();
     }
 };
