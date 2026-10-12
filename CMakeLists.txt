@@ -1,7 +1,4 @@
-﻿# CMakeList.txt : CMake project for DogAteMyMouse, include source and define
-# project specific logic here.
-#
-cmake_minimum_required (VERSION 3.10)
+﻿cmake_minimum_required (VERSION 3.10)
 project(DogAteMyMouse)
 
 set(CMAKE_CXX_STANDARD 23)
@@ -34,23 +31,35 @@ add_executable (${PROJECT_NAME}
     "src/matchengine.h"
     "src/keygen.h"
     "src/entity.h"
-    "src/directxgraphics.h"
     "src/manager.h"
     "src/concepts/keygenerator.h"
     "src/concepts/targetkeysmanager.h"
     "src/concepts/mousemanager.h"
     "src/concepts/screenrenderer.h"
     "src/concepts/keyboardmanager.h"
-    "src/winkeyboard.h"
     "src/overlaycontext.h"
-    "src/winmouse.h"
-    "src/wincapturer.h" 
     "src/strategies/cca.h"
     "src/emptyconfig.h"
     "src/util.h"
     "src/compositionfactory.h"
-    "src/wincomposition.h"
+    )
+
+if(WIN32)
+
+target_include_directories(${PROJECT_NAME} PRIVATE 
+    src/windows/
 )
+
+target_sources(${PROJECT_NAME} PRIVATE
+    "src/winkeyboard.h"
+    "src/directxgraphics.h"
+    "src/windows/wincomposition.h"
+    "src/windows/osinfo.h"
+    "src/winmouse.h"
+    "src/wincapturer.h" 
+)
+
+endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC
   ${IMGUI_DIR}

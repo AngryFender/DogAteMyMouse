@@ -7,6 +7,7 @@
 #include "keygen.h"
 #include "strategies/cca.h"
 #include "compositionfactory.h"
+#include "osinfo.h"
 
 //hide the console window
 #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup" )

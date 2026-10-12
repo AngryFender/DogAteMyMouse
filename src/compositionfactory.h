@@ -10,9 +10,6 @@
 #include "./concepts/keyboardmanager.h"
 #include "./concepts/targetkeysmanager.h"
 #include "./concepts/mousemanager.h"
-#if defined(_WIN32)
-#include "wincomposition.h"
-#endif
 
 template < typename Factory >
 class CompositionFactory {
@@ -35,5 +32,4 @@ public:
 
 private:
     Factory factory_;
-
 };
