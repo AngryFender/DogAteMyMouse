@@ -42,6 +42,7 @@ add_executable (${PROJECT_NAME}
     "src/emptyconfig.h"
     "src/util.h"
     "src/compositionfactory.h"
+    "src/osinfo.h"
     )
 
 if(WIN32)
@@ -51,12 +52,11 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 target_sources(${PROJECT_NAME} PRIVATE
-    "src/winkeyboard.h"
-    "src/directxgraphics.h"
+    "src/windows/winkeyboard.h"
+    "src/windows/directxgraphics.h"
     "src/windows/wincomposition.h"
-    "src/windows/osinfo.h"
-    "src/winmouse.h"
-    "src/wincapturer.h" 
+    "src/windows/winmouse.h"
+    "src/windows/wincapturer.h" 
 )
 
 endif()

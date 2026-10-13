@@ -1,9 +1,8 @@
 #pragma once
-#include "../directxgraphics.h"
-#include "../winkeyboard.h"
-#include "../winmouse.h"
-#include "../wincapturer.h"
-#include "../overlaycontext.h"
+#include "directxgraphics.h"
+#include "winkeyboard.h"
+#include "winmouse.h"
+#include "wincapturer.h"
 #include "../concepts/keyboardmanager.h"
 #include "../concepts/screenrenderer.h"
 #include "../concepts/mousemanager.h"
