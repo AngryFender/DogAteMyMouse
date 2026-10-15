@@ -1,0 +1,17 @@
+{
+	"version": 3,
+	"configurePresets": [
+		{
+			"name": "windows",
+			"displayName": "Windows",
+			"generator": "Ninja",
+			"binaryDir": "${sourceDir}/out/build/${presetName}",
+			"cacheVariables": {
+				"OpenCV_DIR": "C:/common/opencv/build"
+			},
+			"environment": {
+				"PATH": "C:/common/opencv/build/x64/vc16/bin;$penv{PATH}"
+			}
+		}
+	]
+}
