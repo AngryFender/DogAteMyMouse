@@ -2,12 +2,14 @@
 	"version": 3,
 	"configurePresets": [
 		{
-			"name": "windows",
-			"displayName": "Windows",
+			"name": "windows-clang-debug",
+			"displayName": "Windows x64 Clang Debug",
 			"generator": "Ninja",
 			"binaryDir": "${sourceDir}/out/build/${presetName}",
 			"cacheVariables": {
-				"OpenCV_DIR": "C:/common/opencv/build"
+				"OpenCV_DIR": "C:/common/opencv/build",
+				"CMAKE_C_COMPILER": "clang-cl.exe",
+				"CMAKE_CXX_COMPILER": "clang-cl.exe"
 			},
 			"environment": {
 				"PATH": "C:/common/opencv/build/x64/vc16/bin;$penv{PATH}"
