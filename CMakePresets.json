@@ -2,8 +2,8 @@
 	"version": 3,
 	"configurePresets": [
 		{
-			"name": "windows-clang-debug",
-			"displayName": "Windows x64 Clang Debug",
+			"name": "windows-clang-base",
+			"hidden":  true,
 			"generator": "Ninja",
 			"binaryDir": "${sourceDir}/out/build/${presetName}",
 			"cacheVariables": {
@@ -13,6 +13,22 @@
 			},
 			"environment": {
 				"PATH": "C:/common/opencv/build/x64/vc16/bin;$penv{PATH}"
+			}
+		},
+		{
+			"name": "windows-clang-debug",
+			"displayName": "Windows x64 Clang Debug",
+			"inherits": "windows-clang-base",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug"
+			}
+		},
+		{
+			"name": "windows-clang-release",
+			"displayName": "Windows x64 Clang Release",
+			"inherits": "windows-clang-base",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release"
 			}
 		}
 	]
