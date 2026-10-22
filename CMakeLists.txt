@@ -1,4 +1,4 @@
-﻿cmake_minimum_required (VERSION 3.10)
+﻿cmake_minimum_required (VERSION 3.29)
 project(DogAteMyMouse)
 
 set(CMAKE_CXX_STANDARD 23)
@@ -71,3 +71,6 @@ target_link_libraries(${PROJECT_NAME}
   dxgi
   ${OpenCV_LIBS}
 )
+
+enable_testing()
+add_subdirectory(tests)
