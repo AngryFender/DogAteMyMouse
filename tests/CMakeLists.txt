@@ -14,7 +14,8 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 add_executable(Test
-    test_matchengine.cpp
+    "test_matchengine.cpp"
+    "mock/mockkeygen.h"
 )
 
 target_link_libraries(Test PRIVATE
@@ -23,4 +24,7 @@ target_link_libraries(Test PRIVATE
     GTest::gmock       # The mocking framework
 )
 
+target_include_directories(Test PRIVATE "${CMAKE_SOURCE_DIR}/src")
+
 include(GoogleTest)
+gtest_discover_tests(Test)
