@@ -20,7 +20,12 @@ class MatchEngine
 {
 public:
     ~MatchEngine() = default;
-    MatchEngine(KeyGen&& keygen) :keygen_(std::move(keygen))
+    
+    //Reference Collapsing happens here. If there is at least one single &,
+    //the whole thing collapses into a single &.
+    //For example : MatchEgine(T& && keygen) 
+    //becomes : MatchEngine(T& keygen)
+    MatchEngine(KeyGen&& keygen) :keygen_(std::forward<KeyGen>(keygen))
     {
     }
 
