@@ -3,72 +3,75 @@
 #include "gtest/gtest.h"
 #include "mock/mockkeygen.h"
 
-class MatchEngineFix : public testing::Test {
+namespace {
 
-protected:
-	std::vector<std::pair<float, float>> points_source;
-	ScreenInfo empty_screen;
-	std::vector<Key> fake_keys;
-	
-	testing::NiceMock<MockKeygen> mock_gen;
-	MatchEngine<MockKeygen&> eng;
+	class MatchEngineFix : public testing::Test {
 
-	MatchEngineFix() : 
-		points_source{ { 1.0f, 2.0f } ,{ 4.0f, 4.0f } },
-		empty_screen{},
-		fake_keys{ Key{ 'f','f' }, Key{ 'j','j' } },
-		eng(mock_gen) 
-	{
-		ON_CALL(mock_gen, generate(testing::_, testing::_))
-			.WillByDefault(testing::Return(fake_keys));
+	protected:
+		std::vector<std::pair<float, float>> points_source;
+		ScreenInfo empty_screen;
+		std::vector<Key> fake_keys;
+
+		testing::NiceMock<MockKeygen> mock_gen;
+		MatchEngine<MockKeygen&> eng;
+
+		MatchEngineFix() :
+			points_source{ { 1.0f, 2.0f } ,{ 4.0f, 4.0f } },
+			empty_screen{},
+			fake_keys{ Key{ 'f','f' }, Key{ 'j','j' } },
+			eng(mock_gen)
+		{
+			ON_CALL(mock_gen, generate(testing::_, testing::_))
+				.WillByDefault(testing::Return(fake_keys));
+		}
+	};
+
+
+	TEST(MatchEngine, char_to_uint16) {
+		EXPECT_EQ(char_into_uint16_t('a', 'b'), 0x6162);
+		EXPECT_EQ(char_into_uint16_t('1', '0'), 0x3130);
+		EXPECT_EQ(char_into_uint16_t('A', 'B'), 0x4142);
 	}
-};
+
+	TEST_F(MatchEngineFix, generate_keys) {
+		EXPECT_CALL(mock_gen, generate(testing::_, testing::_)).Times(1);
+		auto generated_keys1 = eng.get_target_keys(points_source, empty_screen);
+		EXPECT_EQ(fake_keys, generated_keys1);
+	}
+
+	TEST_F(MatchEngineFix, match) {
+
+		eng.get_target_keys(points_source, empty_screen);
+
+		EXPECT_FALSE(eng.match_target_keys('f'));
+		auto result2 = eng.match_target_keys('f');
+		EXPECT_TRUE(result2);
+
+		EXPECT_EQ(points_source.front(), result2.value());
+	}
 
 
-TEST(MatchEngine, char_to_uint16) {
-	EXPECT_EQ(char_into_uint16_t('a', 'b'), 0x6162);
-	EXPECT_EQ(char_into_uint16_t('1', '0'), 0x3130);
-	EXPECT_EQ(char_into_uint16_t('A', 'B'), 0x4142);
-}
+	TEST_F(MatchEngineFix, match_twice) {
 
-TEST_F(MatchEngineFix, generate_keys) {
-	EXPECT_CALL(mock_gen, generate(testing::_, testing::_)).Times(1);
-	auto generated_keys1 = eng.get_target_keys(points_source, empty_screen);
-	EXPECT_EQ(fake_keys, generated_keys1);
-}
+		EXPECT_CALL(mock_gen, generate(testing::_, testing::_)).Times(2);
 
-TEST_F(MatchEngineFix, match) {
+		eng.get_target_keys(points_source, empty_screen);
 
-	eng.get_target_keys(points_source, empty_screen);
+		auto result1 = eng.match_target_keys('f');
+		EXPECT_FALSE(result1);
 
-	EXPECT_FALSE(eng.match_target_keys('f'));
-	auto result2 = eng.match_target_keys('f');
-	EXPECT_TRUE(result2);
+		auto result2 = eng.match_target_keys('f');
+		EXPECT_TRUE(result2);
+		EXPECT_EQ(points_source.front(), result2.value());
 
-	EXPECT_EQ(points_source.front(), result2.value());
-}
+		auto generated_keys2 = eng.get_target_keys(points_source, empty_screen);
+		EXPECT_EQ(fake_keys, generated_keys2);
 
+		auto result3 = eng.match_target_keys('j');
+		EXPECT_FALSE(result3);
 
-TEST_F(MatchEngineFix, match_twice) {
-
-	EXPECT_CALL(mock_gen, generate(testing::_, testing::_)).Times(2);
-
-	eng.get_target_keys(points_source, empty_screen);
-
-	auto result1 = eng.match_target_keys('f');
-	EXPECT_FALSE(result1);
-
-	auto result2 = eng.match_target_keys('f');
-	EXPECT_TRUE(result2);
-	EXPECT_EQ(points_source.front(), result2.value());
-
-	auto generated_keys2 = eng.get_target_keys(points_source, empty_screen);
-	EXPECT_EQ(fake_keys, generated_keys2);
-
-	auto result3 = eng.match_target_keys('j');
-	EXPECT_FALSE(result3);
-
-	auto result4 = eng.match_target_keys('j');
-	EXPECT_TRUE(result4);
-	EXPECT_EQ(points_source.back(), result4.value());
+		auto result4 = eng.match_target_keys('j');
+		EXPECT_TRUE(result4);
+		EXPECT_EQ(points_source.back(), result4.value());
+	}
 }
