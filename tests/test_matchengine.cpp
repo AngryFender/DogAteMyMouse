@@ -39,7 +39,7 @@ namespace {
 		EXPECT_EQ(fake_keys, generated_keys1);
 	}
 
-	TEST_F(MatchEngineFix, match) {
+	TEST_F(MatchEngineFix, match_using_chars) {
 
 		eng.get_target_keys(points_source, empty_screen);
 
@@ -51,7 +51,7 @@ namespace {
 	}
 
 
-	TEST_F(MatchEngineFix, match_twice) {
+	TEST_F(MatchEngineFix, reset_by_matching_chars) {
 
 		EXPECT_CALL(mock_gen, generate(testing::_, testing::_)).Times(2);
 
@@ -63,7 +63,8 @@ namespace {
 		auto result2 = eng.match_target_keys('f');
 		EXPECT_TRUE(result2);
 		EXPECT_EQ(points_source.front(), result2.value());
-
+		
+		//buffer is reset here
 		auto generated_keys2 = eng.get_target_keys(points_source, empty_screen);
 		EXPECT_EQ(fake_keys, generated_keys2);
 
@@ -74,4 +75,56 @@ namespace {
 		EXPECT_TRUE(result4);
 		EXPECT_EQ(points_source.back(), result4.value());
 	}
+
+	TEST_F(MatchEngineFix, reset_buffer) {
+
+		eng.get_target_keys(points_source, empty_screen);
+
+		EXPECT_FALSE(eng.match_target_keys('f'));
+
+		eng.clear();
+
+		EXPECT_FALSE(eng.match_target_keys('f'));
+		auto result2 = eng.match_target_keys('f');
+		EXPECT_TRUE(result2);
+
+		EXPECT_EQ(points_source.front(), result2.value());
+	}
+
+	TEST_F(MatchEngineFix, reset_after_random_chars) {
+
+		eng.get_target_keys(points_source, empty_screen);
+
+		EXPECT_FALSE(eng.match_target_keys('x'));
+		EXPECT_FALSE(eng.match_target_keys('y'));
+
+		EXPECT_FALSE(eng.match_target_keys('f'));
+		auto result2 = eng.match_target_keys('f');
+		EXPECT_TRUE(result2);
+
+		EXPECT_EQ(points_source.front(), result2.value());
+	}
+
+	TEST_F(MatchEngineFix, match_without_generation) {
+
+		EXPECT_FALSE(eng.match_target_keys('f'));
+		EXPECT_FALSE(eng.match_target_keys('f'));
+
+	}
+
+	TEST_F(MatchEngineFix, match_directly_after_match) {
+
+		eng.get_target_keys(points_source, empty_screen);
+
+		EXPECT_FALSE(eng.match_target_keys('f'));
+		auto result1 = eng.match_target_keys('f');
+		EXPECT_TRUE(result1);
+
+		EXPECT_EQ(points_source.front(), result1.value());
+
+		EXPECT_FALSE(eng.match_target_keys('g'));
+		EXPECT_FALSE(eng.match_target_keys('g'));
+
+	}
+
 }

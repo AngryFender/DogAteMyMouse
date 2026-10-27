@@ -19,8 +19,6 @@ template <KeyGenerator KeyGen>
 class MatchEngine
 {
 public:
-    ~MatchEngine() = default;
-    
     //Reference Collapsing happens here. If there is at least one single &,
     //the whole thing collapses into a single &.
     //For example : MatchEgine(T& && keygen) 
@@ -47,10 +45,8 @@ public:
                 buffer_.pop();
             }
         }
-
-        while (!buffer_.empty()) {
-            buffer_.pop();
-        }
+        
+        clear();
         return result;
     }
 

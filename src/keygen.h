@@ -7,8 +7,6 @@
 class KeyGen
 {
 public:
-    ~KeyGen() = default;
-
     KeyGen(const PossibleCombo& combination) :qcombos_{}
     {
         for (const Key& key : combination)
