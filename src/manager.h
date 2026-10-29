@@ -68,7 +68,7 @@ public:
                     coordinates_ = detect_strat_(std::move(screenshot));
 
                     //generate random keys and coordinates
-                    keys_ = match_engine_.get_target_keys(coordinates_, renderer_.screenInfo());
+                    keys_ = match_engine_.get_target_keys(coordinates_, renderer_.screen_info());
 
                     //refresh is important for the render loop to get the 
                     renderer_.refresh();
@@ -81,7 +81,7 @@ public:
                     match_engine_.clear();
                 }
 
-                renderer_.showOverlay(show_overlay);
+                renderer_.show_overlay(show_overlay);
                 is_overlay_visible_ = show_overlay;
             }
         );
@@ -98,7 +98,7 @@ public:
                     mouse_clicker_.click(pixel);
 
                     //hide window through renderer;
-                    renderer_.showOverlay(false);
+                    renderer_.show_overlay(false);
                     is_overlay_visible_ = false;
 
                     //clear all states

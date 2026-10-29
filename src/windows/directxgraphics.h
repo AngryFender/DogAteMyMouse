@@ -170,7 +170,7 @@ public:
         HRESULT hr = g_pSwapChain->Present(1, 0);
     }
 
-    void showOverlay(bool show) const
+    void show_overlay(bool show) const
     {
         int mode = show ? SW_SHOWDEFAULT : SW_HIDE;
         ::ShowWindow(context_.hWnd, mode);
@@ -183,7 +183,7 @@ public:
         ::PostMessage(context_.hWnd, WM_NULL, 0, 0);
     }
 
-    const ScreenInfo& screenInfo() const {
+    const ScreenInfo& screen_info() const {
         return context_.screen;
     }
 

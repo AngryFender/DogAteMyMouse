@@ -18,6 +18,7 @@ add_executable(Test
     "mock/mockkeygen.h"
     "mock/mockkeyboard.h"
 	"mock/mockmouse.h"
+    "mock/mockscreenrenderer.h"
 )
 
 target_link_libraries(Test PRIVATE
