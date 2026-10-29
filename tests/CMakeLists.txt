@@ -16,6 +16,7 @@ FetchContent_MakeAvailable(googletest)
 add_executable(Test
     "test_matchengine.cpp"
     "mock/mockkeygen.h"
+    "mock/mockkeyboard.h"
 )
 
 target_link_libraries(Test PRIVATE
