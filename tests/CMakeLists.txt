@@ -17,6 +17,7 @@ add_executable(Test
     "test_matchengine.cpp"
     "mock/mockkeygen.h"
     "mock/mockkeyboard.h"
+	"mock/mockmouse.h"
 )
 
 target_link_libraries(Test PRIVATE
