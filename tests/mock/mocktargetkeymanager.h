@@ -14,7 +14,7 @@ public:
     MOCK_METHOD(
         (std::vector<Key>),
         get_target_keys,
-        ((const std::vector<std::pair<float, float>>&) coordinates, const std::vector<Key>& keys)
+        ((const std::vector<std::pair<float, float>>&) coordinates, const ScreenInfo& screen)
     );
 
     MOCK_METHOD(
