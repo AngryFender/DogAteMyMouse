@@ -1,6 +1,5 @@
 #pragma once
 #include "entity.h"
-#include "overlaycontext.h"
 #include <vector>
 #include <concepts>
 #include "./concepts/screenrenderer.h"
@@ -39,13 +38,13 @@ public:
         MatchEngine&& match_engine,
         DetectStrat&& detect_strat)
         :
-        config_(std::move(config)),
-        renderer_(std::move(renderer)),
-        keyboard_listener_(std::move(listener)),
-        screen_capturer_(std::move(capturer)),
-        mouse_clicker_(std::move(clicker)),
-        match_engine_(std::move(match_engine)),
-        detect_strat_(std::move(detect_strat)),
+        config_(std::forward<Config>(config)),
+        renderer_(std::forward<Renderer>(renderer)),
+        keyboard_listener_(std::forward<KeyboardListener>(listener)),
+        screen_capturer_(std::forward<ScreenCapturer>(capturer)),
+        mouse_clicker_(std::forward<MouseClicker>(clicker)),
+        match_engine_(std::forward<MatchEngine>(match_engine)),
+        detect_strat_(std::forward<DetectStrat>(detect_strat)),
         shutdown{ false },
         is_overlay_visible_{ false }
     {
@@ -135,7 +134,7 @@ public:
     }
 
     void stop() {
-
+        shutdown = true;
     }
 
     ~Manager() {
