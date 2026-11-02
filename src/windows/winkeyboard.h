@@ -11,6 +11,8 @@ class WinKeyboard {
 public:
     WinKeyboard() {
 
+        thread_id = ::GetCurrentThreadId();
+
         //setting global low level keyboard hook
         HINSTANCE hInstance = ::GetModuleHandle(NULL);
         hook_ = ::SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInstance, 0);
@@ -80,8 +82,15 @@ public:
         }
     }
 
+    void cancel() {
+        if (thread_id != 0) {
+			::PostThreadMessage(thread_id, WM_QUIT, 0, 0);
+		}
+    }
+
 private:
     HHOOK hook_ = nullptr;
+    DWORD thread_id = 0;
     inline static std::map<DWORD, bool> shortcuts_;
     inline static std::function<void(bool)> overlay_callback_;
     inline static std::function<void(const char)> keypress_callback_;

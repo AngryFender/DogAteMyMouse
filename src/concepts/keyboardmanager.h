@@ -17,4 +17,5 @@ concept KeyboardManager = requires(
     { obj.set_overlay_state_getter(overlay_state_getter) }-> std::same_as<void>;
     { obj.wait_message() }->std::same_as<void>;
     { obj.handle_message() }->std::same_as<void>;
+    { obj.cancel() }->std::same_as<void>;
 };

@@ -135,6 +135,7 @@ public:
 
     void stop() {
         shutdown = true;
+        keyboard_listener_.cancel();
     }
 
     ~Manager() {
