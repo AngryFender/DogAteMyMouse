@@ -25,6 +25,12 @@ public:
 
     MOCK_METHOD(
         void,
+        set_thread_context,
+        (int context)
+    );
+
+    MOCK_METHOD(
+        void,
         wait_message,
         ()
     );
@@ -34,4 +40,11 @@ public:
         handle_message,
         ()
     );
+
+    MOCK_METHOD(
+        void,
+        cancel,
+        ()
+    );
+
 };
