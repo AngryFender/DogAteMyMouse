@@ -11,10 +11,6 @@ class WinKeyboard {
 public:
     WinKeyboard() {
 
-        //setting global low level keyboard hook
-        HINSTANCE hInstance = ::GetModuleHandle(NULL);
-        hook_ = ::SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInstance, 0);
-
         //default shortcut of left and right shifts keys 
         shortcuts_[VK_LSHIFT] = false;
         shortcuts_[VK_RSHIFT] = false;
@@ -58,8 +54,11 @@ public:
         is_overlay_visible_ = std::move(getter);
     }
 
-    void set_thread_context(int context) {
-        thread_context_ = static_cast<DWORD>(context);
+    void bind_thread_id() {
+        //setting global low level keyboard hook
+        HINSTANCE hInstance = ::GetModuleHandle(NULL);
+        hook_ = ::SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInstance, 0);
+        thread_context_ = ::GetCurrentThreadId();
     }
 
     //blocking until a key is pressed

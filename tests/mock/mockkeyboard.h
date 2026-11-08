@@ -25,8 +25,8 @@ public:
 
     MOCK_METHOD(
         void,
-        set_thread_context,
-        (int context)
+        bind_thread_id,
+        ()
     );
 
     MOCK_METHOD(
