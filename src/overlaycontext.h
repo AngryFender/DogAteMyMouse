@@ -18,7 +18,10 @@ struct OverlayContext {
     ScreenInfo screen;
     WNDCLASSEXW wc;
 
-    OverlayContext() {
+	OverlayContext() {
+    }
+
+    void init() {
         ::ImGui_ImplWin32_EnableDpiAwareness();
         screen.width = ::GetSystemMetrics(SM_CXSCREEN);
         screen.height = ::GetSystemMetrics(SM_CYSCREEN);
@@ -32,6 +35,7 @@ struct OverlayContext {
 
         ::RegisterClassExW(&wc);
         hWnd = ::CreateWindowExW(WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW, wc.lpszClassName, L"Dog ate my mouse", WS_POPUP, 0, 0, screen.width, screen.height, nullptr, nullptr, wc.hInstance, nullptr);
+
     }
 
     ~OverlayContext() {
