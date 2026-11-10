@@ -49,15 +49,12 @@ public:
     }
 
     ~DirectXGraphics() {
-        if (g_pd3dDevice) {
-            ::ImGui_ImplDX11_Shutdown();
-            ::ImGui_ImplWin32_Shutdown();
-            ImGui::DestroyContext();
-        }
-        CleanupDeviceD3D();
+        cleanup();
     }
     
     void init() {
+        context_.init();
+
         ::SetProcessDPIAware();
         float main_scale = ::ImGui_ImplWin32_GetDpiScaleForMonitor(::MonitorFromPoint(POINT{ 0,0 }, MONITOR_DEFAULTTOPRIMARY));
 
@@ -87,6 +84,15 @@ public:
         //setup platform/renderer backends
         ::ImGui_ImplWin32_Init(context_.hWnd);
         ::ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
+    }
+
+    void cleanup() {
+        if (g_pd3dDevice) {
+            ::ImGui_ImplDX11_Shutdown();
+            ::ImGui_ImplWin32_Shutdown();
+            ImGui::DestroyContext();
+        }
+        CleanupDeviceD3D();
     }
 
     void render_frame(const std::vector<std::pair<float, float>>& coordinates, const std::vector<Key>& keys) {

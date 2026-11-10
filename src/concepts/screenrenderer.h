@@ -10,6 +10,7 @@ concept ScreenRenderer = requires (T obj,const std::vector<std::pair<float, floa
     { obj.render_frame(coordinates, keys) } -> std::same_as<void>;
     { obj.show_overlay(show) } -> std::same_as<void>;
     { obj.refresh() } -> std::same_as<void>;
+    { obj.cleanup() } -> std::same_as<void>;
     { obj.screen_info() }->std::same_as<const ScreenInfo&>;
 };
 

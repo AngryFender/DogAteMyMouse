@@ -25,6 +25,12 @@ public:
 
     MOCK_METHOD(
         void,
+        cleanup,
+        ()
+	);
+
+    MOCK_METHOD(
+        void,
         refresh,
         ()
 	);
