@@ -8,6 +8,7 @@
 #include "./concepts/mousemanager.h"
 #include <utility>
 #include <algorithm>
+#include <thread>
 
 template <typename C>
 using ImageReturnType = decltype(std::declval<C>().capture());
@@ -48,8 +49,6 @@ public:
         shutdown{ false },
         is_overlay_visible_{ false }
     {
-        //init
-        renderer_.init();
 
         coordinates_.reserve(TOTAL_COMBINATION);
         keys_.reserve(TOTAL_COMBINATION);
@@ -116,30 +115,46 @@ public:
 
     }
 
-    void start() {
-        //control loop
-        while (!shutdown) {
+	void start() {
+		//start control thread
+		thread_ = std::thread(([&]() {
+			//init
+			renderer_.init();
+            keyboard_listener_.bind_thread_id();
 
-            if (!is_overlay_visible_) {
-                keyboard_listener_.wait_message(); //get message, translate message & dispatch message
-                continue;
-            }
 
-            //logic when window is visible
-            keyboard_listener_.handle_message(); //peek message, translate message & dispatch message
+			while (!shutdown) {
 
-            //render frames
-            renderer_.render_frame(coordinates_, keys_);
-        }
-    }
+				if (!is_overlay_visible_) {
+					keyboard_listener_.wait_message(); //get message, translate message & dispatch message
+					continue;
+				}
+
+				//logic when window is visible
+				keyboard_listener_.handle_message(); //peek message, translate message & dispatch message
+
+				//render frames
+				renderer_.render_frame(coordinates_, keys_);
+			}
+
+            renderer_.cleanup();
+			}));
+	}
 
     void stop() {
-        shutdown = true;
+        shutdown.store(true);
         keyboard_listener_.cancel();
     }
 
+    void wait() {
+        if (thread_.joinable()) {
+            thread_.join();
+        }
+
+    }
+
     ~Manager() {
-        shutdown = true;
+        wait();
     }
 
 private:
@@ -150,9 +165,10 @@ private:
     MouseClicker mouse_clicker_;
     MatchEngine match_engine_;
     DetectStrat detect_strat_;
+    std::thread thread_;
 
     //local data
-    bool shutdown;
+    std::atomic_bool shutdown;
     std::vector<std::pair<float, float>> coordinates_;
     std::vector<Key> keys_;
     bool is_overlay_visible_;
