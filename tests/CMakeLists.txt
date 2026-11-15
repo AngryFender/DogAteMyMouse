@@ -14,12 +14,15 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 add_executable(Test
-    "test_matchengine.cpp"
     "mock/mockkeygen.h"
     "mock/mockkeyboard.h"
 	"mock/mockmouse.h"
     "mock/mockscreenrenderer.h"
     "mock/mocktargetkeymanager.h"
+    "mock/mockstrategy.h"
+    "mock/mockconfig.h" 
+    "test_matchengine.cpp"
+    "test_manager.cpp"
 )
 
 target_link_libraries(Test PRIVATE
