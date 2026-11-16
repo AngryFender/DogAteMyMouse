@@ -21,6 +21,10 @@ namespace {
 		testing::NiceMock<MockScreenCapturer> mock_screen_capturer;
 		testing::NiceMock<MockTargetKeyManager> mock_target_key_manager;
 		testing::NiceMock<MockStrategy> mock_strategy;
+
+		ManagerFix() {
+
+		}
 	};
 
 	TEST_F(ManagerFix, init) {
@@ -100,4 +104,36 @@ namespace {
 		manager.start();
 		manager.stop();
 	}
+
+	TEST_F(ManagerFix, after_overlay_trigger ) {
+
+		EXPECT_CALL(mock_keyboard, set_overlay_callback(testing::_, testing::_)).Times(1);
+		EXPECT_CALL(mock_keyboard, set_keypress_callback(testing::_)).Times(1);
+		EXPECT_CALL(mock_keyboard, set_overlay_state_getter(testing::_)).Times(1);
+
+		Manager<
+			MockConfig&,
+			MockScreenRenderer&,
+			MockKeyboard&,
+			MockScreenCapturer&,
+			MockMouse&,
+			MockTargetKeyManager&,
+			MockStrategy&
+		>
+			manager(
+				mock_config,
+				mock_screen_renderer,
+				mock_keyboard,
+				mock_screen_capturer,
+				mock_mouse,
+				mock_target_key_manager,
+				mock_strategy
+			);
+		manager.start();
+
+		//overlay trigger here
+
+		manager.stop();
+	}
+
 }
